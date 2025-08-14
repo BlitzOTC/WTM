@@ -125,24 +125,32 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   type="button"
                   variant={eventType === 'venue' ? 'default' : 'outline'}
                   onClick={() => setEventType('venue')}
-                  className={`p-4 h-auto text-left ${eventType === 'venue' ? 'bg-[#5bf070ad] hover:bg-[#5bf070ad]' : ''}`}
+                  className={`p-4 h-auto text-left transition-all ${
+                    eventType === 'venue' 
+                      ? 'bg-[#00d41173] hover:bg-[#00d41180]' 
+                      : 'hover:bg-gray-100'
+                  }`}
                   data-testid="button-event-type-venue"
                 >
                   <div>
                     <div className="font-medium text-gray-900">🏢 Venue Event</div>
-                    <div className="text-sm text-gray-500">Bar, restaurant, club posting</div>
+                    <div className="text-sm text-gray-700 font-medium">Bar, restaurant, club posting</div>
                   </div>
                 </Button>
                 <Button
                   type="button"
                   variant={eventType === 'personal' ? 'default' : 'outline'}
                   onClick={() => setEventType('personal')}
-                  className={`p-4 h-auto text-left ${eventType === 'personal' ? 'bg-[#00d41173] hover:bg-[#00d41180]' : ''}`}
+                  className={`p-4 h-auto text-left transition-all ${
+                    eventType === 'personal' 
+                      ? 'bg-[#00d41173] hover:bg-[#00d41180]' 
+                      : 'hover:bg-gray-100'
+                  }`}
                   data-testid="button-event-type-personal"
                 >
                   <div>
                     <div className="font-medium text-gray-900">🎉 Personal Event</div>
-                    <div className="text-sm text-gray-500">House party, gathering</div>
+                    <div className="text-sm text-gray-700 font-medium">House party, gathering</div>
                   </div>
                 </Button>
               </div>
