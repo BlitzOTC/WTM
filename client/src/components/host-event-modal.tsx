@@ -125,7 +125,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   type="button"
                   variant={eventType === 'venue' ? 'default' : 'outline'}
                   onClick={() => setEventType('venue')}
-                  className="p-4 h-auto text-left"
+                  className={`p-4 h-auto text-left ${eventType === 'venue' ? 'bg-[#5bf070ad] hover:bg-[#5bf070ad]' : ''}`}
                   data-testid="button-event-type-venue"
                 >
                   <div>
