@@ -6,9 +6,9 @@ import EventCard from "@/components/event-card";
 import NightPlan from "@/components/night-plan";
 import HostEventModal from "@/components/host-event-modal";
 import EventDetailModal from "@/components/event-detail-modal";
-import { Search, Menu, User } from "lucide-react";
+import LocationSearch from "@/components/location-search";
+import { Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Filters {
@@ -114,19 +114,11 @@ export default function Home() {
 
             {/* Location Search */}
             <div className="hidden md:flex flex-1 max-w-lg mx-8">
-              <div className="relative w-full">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
-                </div>
-                <Input
-                  type="text"
-                  placeholder="Enter city, state..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                  data-testid="input-location-search"
-                />
-              </div>
+              <LocationSearch
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Enter city, state..."
+              />
             </div>
 
             <div className="flex items-center space-x-4">
@@ -157,6 +149,15 @@ export default function Home() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Mobile Location Search */}
+        <div className="md:hidden mb-4">
+          <LocationSearch
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Enter city, state..."
+          />
+        </div>
+        
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Filter Sidebar */}
           <aside className={`lg:w-80 space-y-6 ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>

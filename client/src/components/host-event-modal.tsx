@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import LocationSearch from "@/components/location-search";
 
 interface HostEventModalProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ const categories = [
 
 export default function HostEventModal({ isOpen, onClose }: HostEventModalProps) {
   const [eventType, setEventType] = useState<'venue' | 'personal'>('venue');
+  const [locationInput, setLocationInput] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -96,6 +98,14 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
       : currentCategories.filter(id => id !== categoryId);
     
     form.setValue('categories', newCategories);
+  };
+
+  const handleLocationChange = (location: string) => {
+    setLocationInput(location);
+    // Parse location to extract city and state
+    const [city, state] = location.split(',').map(s => s.trim());
+    if (city) form.setValue('city', city);
+    if (state) form.setValue('state', state);
   };
 
   return (
@@ -166,6 +176,17 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   </FormItem>
                 )}
               />
+            </div>
+
+            {/* Location Search */}
+            <div>
+              <Label className="block text-sm font-medium text-gray-700 mb-2">Location Search</Label>
+              <LocationSearch
+                value={locationInput}
+                onChange={handleLocationChange}
+                placeholder="Search for city, state..."
+              />
+              <p className="text-xs text-gray-500 mt-1">This will auto-fill the city and state fields below</p>
             </div>
 
             {/* Address */}
