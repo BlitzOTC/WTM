@@ -137,7 +137,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   type="button"
                   variant={eventType === 'personal' ? 'default' : 'outline'}
                   onClick={() => setEventType('personal')}
-                  className="p-4 h-auto text-left"
+                  className={`p-4 h-auto text-left ${eventType === 'personal' ? 'bg-[#00d41173] hover:bg-[#00d41180]' : ''}`}
                   data-testid="button-event-type-personal"
                 >
                   <div>
