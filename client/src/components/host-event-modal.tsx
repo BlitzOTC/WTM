@@ -204,7 +204,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel className="text-center block">Address</FormLabel>
                     <FormControl>
                       <Input placeholder="123 Main St" {...field} data-testid="input-event-address" />
                     </FormControl>
@@ -217,7 +217,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel className="text-center block">City</FormLabel>
                     <FormControl>
                       <Input placeholder="San Francisco" {...field} data-testid="input-event-city" />
                     </FormControl>
@@ -230,7 +230,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 name="state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>State</FormLabel>
+                    <FormLabel className="text-center block">State</FormLabel>
                     <FormControl>
                       <Input placeholder="CA" {...field} data-testid="input-event-state" />
                     </FormControl>
@@ -247,7 +247,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 name="startTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Start Time</FormLabel>
+                    <FormLabel className="text-center block">Start Time</FormLabel>
                     <FormControl>
                       <Input type="time" {...field} data-testid="input-event-start-time" />
                     </FormControl>
@@ -260,7 +260,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 name="endTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>End Time</FormLabel>
+                    <FormLabel className="text-center block">End Time</FormLabel>
                     <FormControl>
                       <Input type="time" {...field} data-testid="input-event-end-time" />
                     </FormControl>
@@ -273,7 +273,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cover Charge ($)</FormLabel>
+                    <FormLabel className="text-center block">Cover Charge ($)</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
