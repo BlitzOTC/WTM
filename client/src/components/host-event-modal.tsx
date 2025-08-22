@@ -308,7 +308,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
             {/* Categories and Age Requirements */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="block text-sm font-medium text-gray-700 mb-2 text-center">Categories</Label>
+                <Label className="block text-sm font-medium text-black mb-2 text-center">Categories</Label>
                 <div className="space-y-2">
                   {categories.map((category) => (
                     <div key={category.id} className="flex items-center space-x-2">
