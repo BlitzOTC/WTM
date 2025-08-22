@@ -33,6 +33,7 @@ const categories = [
 export default function HostEventModal({ isOpen, onClose }: HostEventModalProps) {
   const [eventType, setEventType] = useState<'venue' | 'personal'>('venue');
   const [locationInput, setLocationInput] = useState("");
+  const [customCategory, setCustomCategory] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -98,6 +99,19 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
       : currentCategories.filter(id => id !== categoryId);
     
     form.setValue('categories', newCategories);
+  };
+
+  const handleCustomCategoryChange = (checked: boolean) => {
+    const currentCategories = form.getValues('categories') || [];
+    if (checked && customCategory.trim()) {
+      // Add the custom category
+      const newCategories = [...currentCategories, customCategory.trim()];
+      form.setValue('categories', newCategories);
+    } else {
+      // Remove the custom category
+      const newCategories = currentCategories.filter(id => id !== customCategory.trim());
+      form.setValue('categories', newCategories);
+    }
   };
 
   const handleLocationChange = (location: string) => {
@@ -308,6 +322,48 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                       </Label>
                     </div>
                   ))}
+                  
+                  {/* Other Category Option */}
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="category-other"
+                        checked={customCategory.trim() !== "" && form.watch('categories')?.includes(customCategory.trim())}
+                        onCheckedChange={(checked) => {
+                          if (checked && customCategory.trim()) {
+                            handleCustomCategoryChange(true);
+                          } else {
+                            handleCustomCategoryChange(false);
+                          }
+                        }}
+                        data-testid="checkbox-host-category-other"
+                      />
+                      <Label htmlFor="category-other" className="text-sm">
+                        🏷️ Other
+                      </Label>
+                    </div>
+                    <Input
+                      placeholder="Type your category..."
+                      value={customCategory}
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        const oldValue = customCategory.trim();
+                        setCustomCategory(newValue);
+                        
+                        // Update categories if there was an old value
+                        if (oldValue && form.watch('categories')?.includes(oldValue)) {
+                          const currentCategories = form.getValues('categories') || [];
+                          const newCategories = currentCategories.filter(id => id !== oldValue);
+                          if (newValue.trim()) {
+                            newCategories.push(newValue.trim());
+                          }
+                          form.setValue('categories', newCategories);
+                        }
+                      }}
+                      className="ml-6 text-sm"
+                      data-testid="input-custom-category"
+                    />
+                  </div>
                 </div>
               </div>
               <FormField
