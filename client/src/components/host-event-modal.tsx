@@ -149,7 +149,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 >
                   <div>
                     <div className="font-medium text-black text-center">🏢 Venue Event</div>
-                    <div className="text-sm text-gray-700 font-medium">e.g., Bar</div>
+                    <div className="text-sm text-gray-700 font-medium text-center">e.g., Bar</div>
                   </div>
                 </Button>
                 <Button
