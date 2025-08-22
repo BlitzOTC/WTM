@@ -7,6 +7,7 @@ import NightPlan from "@/components/night-plan";
 import HostEventModal from "@/components/host-event-modal";
 import EventDetailModal from "@/components/event-detail-modal";
 import LocationSearch from "@/components/location-search";
+import { usePlan } from "@/hooks/use-plan";
 import { Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -28,11 +29,19 @@ export default function Home() {
     freeOnly: false
   });
   const [sortBy, setSortBy] = useState("time");
-  const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
+  const { events: selectedEvents, addEvent, removeEvent, isInPlan } = usePlan();
   const [showHostModal, setShowHostModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Mock user preferences based on previous activity
+  const userPreferences = {
+    favoriteCategories: ['music', 'drinks', 'food'],
+    preferredAgeGroup: '21',
+    budgetRange: { min: 0, max: 50 },
+    attendedEvents: ['jazz', 'cocktail', 'rooftop']
+  };
 
   // Parse location for API call
   const [city, state] = searchQuery.split(',').map(s => s.trim());
@@ -66,6 +75,39 @@ export default function Home() {
     }
   });
 
+  // Calculate recommendation score for each event
+  const getRecommendationScore = (event: Event) => {
+    let score = 0;
+    
+    // Boost events in user's favorite categories
+    const eventCategories = Array.isArray(event.categories) ? event.categories : [];
+    eventCategories.forEach(category => {
+      if (userPreferences.favoriteCategories.includes(category)) {
+        score += 3;
+      }
+    });
+    
+    // Boost events matching preferred age group
+    if (event.ageRequirement === userPreferences.preferredAgeGroup) {
+      score += 2;
+    }
+    
+    // Boost events within preferred budget range
+    const eventPrice = event.price / 100;
+    if (eventPrice >= userPreferences.budgetRange.min && eventPrice <= userPreferences.budgetRange.max) {
+      score += 2;
+    }
+    
+    // Boost events with keywords from attended events
+    userPreferences.attendedEvents.forEach(keyword => {
+      if (event.name.toLowerCase().includes(keyword) || event.description.toLowerCase().includes(keyword)) {
+        score += 1;
+      }
+    });
+    
+    return score;
+  };
+
   // Sort events
   const sortedEvents = [...events].sort((a, b) => {
     switch (sortBy) {
@@ -73,6 +115,11 @@ export default function Home() {
         return a.price - b.price;
       case 'popularity':
         return (b.currentAttendees || 0) - (a.currentAttendees || 0);
+      case 'recommended':
+        const scoreA = getRecommendationScore(a);
+        const scoreB = getRecommendationScore(b);
+        if (scoreA !== scoreB) return scoreB - scoreA;
+        return a.startTime.localeCompare(b.startTime);
       case 'distance':
         return 0; // Would need geolocation for real distance sorting
       default:
@@ -81,13 +128,11 @@ export default function Home() {
   });
 
   const handleAddToPlan = (event: Event) => {
-    if (!selectedEvents.find(e => e.id === event.id)) {
-      setSelectedEvents([...selectedEvents, event]);
-    }
+    addEvent(event);
   };
 
   const handleRemoveFromPlan = (eventId: string) => {
-    setSelectedEvents(selectedEvents.filter(e => e.id !== eventId));
+    removeEvent(eventId);
   };
 
   const handleViewDetails = (event: Event) => {
@@ -192,6 +237,7 @@ export default function Home() {
                     <SelectValue placeholder="Sort by..." />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="recommended">Recommended for You</SelectItem>
                     <SelectItem value="time">Sort by Time</SelectItem>
                     <SelectItem value="price">Sort by Price</SelectItem>
                     <SelectItem value="popularity">Sort by Popularity</SelectItem>
@@ -231,7 +277,7 @@ export default function Home() {
                     event={event}
                     onAddToPlan={handleAddToPlan}
                     onViewDetails={handleViewDetails}
-                    isInPlan={selectedEvents.some(e => e.id === event.id)}
+                    isInPlan={isInPlan(event.id)}
                     data-testid={`card-event-${event.id}`}
                   />
                 ))}

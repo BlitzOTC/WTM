@@ -1,11 +1,11 @@
-import { useState } from "react";
 import { type Event } from "@shared/schema";
 import EventCard from "@/components/event-card";
 import { BookOpen, MapPin, Clock, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePlan } from "@/hooks/use-plan";
 
 export default function Plan() {
-  const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
+  const { events: selectedEvents, removeEvent, clearPlan } = usePlan();
 
   // Calculate total cost
   const totalCost = selectedEvents.reduce((sum, event) => sum + event.price, 0);
@@ -40,7 +40,7 @@ export default function Plan() {
   };
 
   const handleRemoveFromPlan = (event: Event) => {
-    setSelectedEvents(selectedEvents.filter(e => e.id !== event.id));
+    removeEvent(event.id);
   };
 
   const handleViewDetails = (event: Event) => {
@@ -151,7 +151,7 @@ export default function Plan() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => setSelectedEvents([])}
+                onClick={clearPlan}
                 data-testid="button-clear-plan"
               >
                 Clear Plan
