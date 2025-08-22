@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Settings, Calendar, MapPin, Bell, LogOut, ChevronDown } from "lucide-react";
+import { User, Settings, Calendar, MapPin, Bell, LogOut, ChevronDown, Users, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,18 @@ export default function Profile() {
     name: "Alex Johnson",
     email: "alex.johnson@example.com",
     location: "San Francisco, CA",
+    followers: [
+      { id: '1', name: 'Sarah Chen', avatar: 'SC' },
+      { id: '2', name: 'Mike Rodriguez', avatar: 'MR' },
+      { id: '3', name: 'Emma Davis', avatar: 'ED' },
+      { id: '4', name: 'James Wilson', avatar: 'JW' },
+      { id: '5', name: 'Lisa Park', avatar: 'LP' }
+    ],
+    following: [
+      { id: '6', name: 'David Brown', avatar: 'DB' },
+      { id: '7', name: 'Rachel Green', avatar: 'RG' },
+      { id: '8', name: 'Tom Miller', avatar: 'TM' }
+    ],
     notifications: {
       eventReminders: true,
       newEvents: false,
@@ -20,6 +32,7 @@ export default function Profile() {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'followers' | 'following'>('followers');
 
   const handleSave = () => {
     // TODO: Implement profile save
@@ -115,10 +128,80 @@ export default function Profile() {
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">{profileData.name}</h2>
                   <p className="text-gray-600">{profileData.email}</p>
+                  
+                  {/* Followers/Following Stats */}
+                  <div className="flex items-center space-x-4 mt-3">
+                    <button 
+                      onClick={() => setActiveTab('followers')}
+                      className={`flex items-center space-x-1 text-sm ${activeTab === 'followers' ? 'text-primary font-medium' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
+                      data-testid="button-followers-tab"
+                    >
+                      <Users className="h-4 w-4" />
+                      <span>{profileData.followers.length} Followers</span>
+                    </button>
+                    <button 
+                      onClick={() => setActiveTab('following')}
+                      className={`flex items-center space-x-1 text-sm ${activeTab === 'following' ? 'text-primary font-medium' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
+                      data-testid="button-following-tab"
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      <span>{profileData.following.length} Following</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
+
+          {/* Followers/Following Section */}
+          {!isEditing && (
+            <div className="mt-6 border-t border-gray-200 pt-4">
+              <div className="mb-4">
+                <h3 className="font-medium text-gray-900">
+                  {activeTab === 'followers' ? 'Followers' : 'Following'}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {activeTab === 'followers' 
+                    ? `${profileData.followers.length} people follow you` 
+                    : `You follow ${profileData.following.length} people`}
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-48 overflow-y-auto">
+                {(activeTab === 'followers' ? profileData.followers : profileData.following).map((person) => (
+                  <div key={person.id} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                        {person.avatar}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate" data-testid={`text-person-${person.id}`}>
+                        {person.name}
+                      </p>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-xs px-2 py-1"
+                      data-testid={`button-${activeTab === 'followers' ? 'follow-back' : 'unfollow'}-${person.id}`}
+                    >
+                      {activeTab === 'followers' ? 'Follow' : 'Unfollow'}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              
+              {(activeTab === 'followers' ? profileData.followers : profileData.following).length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <Users className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm">
+                    {activeTab === 'followers' ? 'No followers yet' : 'Not following anyone yet'}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <MapPin className="h-4 w-4" />
