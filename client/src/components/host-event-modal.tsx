@@ -374,7 +374,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                             form.setValue('categories', newCategories);
                           }
                         }}
-                        className="ml-6 text-sm"
+                        className="ml-6 text-sm text-center"
                         data-testid="input-custom-category"
                       />
                     )}
