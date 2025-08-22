@@ -27,10 +27,22 @@ interface RouteVariation {
 export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummaryModalProps) {
   const [selectedVariation, setSelectedVariation] = useState<string>("optimized");
 
+  const formatTime = (timeStr: string) => {
+    const [hours, minutes] = timeStr.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
+
+  const formatCost = (cost: number) => {
+    if (cost === 0) return "FREE";
+    return `${(cost / 100).toFixed(0)}`;
+  };
+
   // Generate route variations
   const generateRouteVariations = (): RouteVariation[] => {
     const sortedByTime = [...events].sort((a, b) => a.startTime.localeCompare(b.startTime));
-    const sortedByLocation = [...events].sort((a, b) => a.venue.localeCompare(b.venue));
     const reverseOrder = [...sortedByTime].reverse();
 
     const calculateTimes = (eventList: Event[]) => {
@@ -44,7 +56,7 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
       const travelTime = (eventList.length - 1) * 15; // 15 minutes between venues
       const totalMinutes = stayTime + travelTime;
       
-      const formatTime = (timeStr: string) => {
+      const formatTimeInternal = (timeStr: string) => {
         const [hours, minutes] = timeStr.split(':');
         const hour = parseInt(hours);
         const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -64,7 +76,7 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
       };
 
       return {
-        startTime: formatTime(firstEvent.startTime),
+        startTime: formatTimeInternal(firstEvent.startTime),
         endTime: calculateEndTime(firstEvent.startTime, totalMinutes),
         totalTime: `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m`,
         travelTime: travelTime
@@ -72,7 +84,6 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
     };
 
     const optimizedTimes = calculateTimes(sortedByTime);
-    const locationTimes = calculateTimes(sortedByLocation);
     const reverseTimes = calculateTimes(reverseOrder);
 
     return [
@@ -82,14 +93,6 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
         description: "Events ordered by start time for smooth flow",
         events: sortedByTime,
         ...optimizedTimes,
-        totalCost: events.reduce((sum, event) => sum + event.price, 0)
-      },
-      {
-        id: "location",
-        name: "Location Clustered",
-        description: "Events grouped by proximity to minimize travel",
-        events: sortedByLocation,
-        ...locationTimes,
         totalCost: events.reduce((sum, event) => sum + event.price, 0)
       },
       {
@@ -105,11 +108,6 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
 
   const routeVariations = generateRouteVariations();
   const selectedRoute = routeVariations.find(r => r.id === selectedVariation) || routeVariations[0];
-
-  const formatCost = (cost: number) => {
-    if (cost === 0) return "FREE";
-    return `$${(cost / 100).toFixed(0)}`;
-  };
 
   const getRecommendedStayTime = (event: Event, index: number, total: number) => {
     // Recommend longer stays for dinner/main events, shorter for drinks
@@ -144,9 +142,9 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
         </DialogHeader>
 
         <Tabs value={selectedVariation} onValueChange={setSelectedVariation} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             {routeVariations.map((variation) => (
-              <TabsTrigger key={variation.id} value={variation.id} className="text-xs">
+              <TabsTrigger key={variation.id} value={variation.id} className="text-sm">
                 {variation.name}
               </TabsTrigger>
             ))}
@@ -230,7 +228,7 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
                           <Clock className="h-3 w-3" />
                           <span className="font-medium">Arrival Time</span>
                         </div>
-                        <div className="ml-5">{event.startTime.replace(':', ':').slice(0, -3)} {parseInt(event.startTime.split(':')[0]) >= 12 ? 'PM' : 'AM'}</div>
+                        <div className="ml-5">{formatTime(event.startTime)}</div>
                       </div>
                       
                       <div className="space-y-1">
