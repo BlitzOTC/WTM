@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { type Event } from "@shared/schema";
 import EventCard from "@/components/event-card";
+import PlanSummaryModal from "@/components/plan-summary-modal";
 import { BookOpen, MapPin, Clock, DollarSign, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -7,6 +9,7 @@ import { usePlan } from "@/hooks/use-plan";
 
 export default function Plan() {
   const { events: selectedEvents, removeEvent, clearPlan } = usePlan();
+  const [showPlanSummary, setShowPlanSummary] = useState(false);
 
   // Calculate total cost
   const totalCost = selectedEvents.reduce((sum, event) => sum + event.price, 0);
@@ -173,6 +176,7 @@ export default function Plan() {
               <Button
                 className="w-full bg-green-600 text-white hover:bg-green-700"
                 size="lg"
+                onClick={() => setShowPlanSummary(true)}
                 data-testid="button-start-night"
               >
                 Start Your Night
@@ -189,6 +193,12 @@ export default function Plan() {
             </div>
           </>
         )}
+
+        <PlanSummaryModal
+          isOpen={showPlanSummary}
+          onClose={() => setShowPlanSummary(false)}
+          events={selectedEvents}
+        />
       </div>
     </div>
   );
