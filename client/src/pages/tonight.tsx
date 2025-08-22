@@ -5,9 +5,10 @@ import EventCard from "@/components/event-card";
 import FilterSidebar from "@/components/filter-sidebar";
 import LocationSearch from "@/components/location-search";
 import { usePlan } from "@/hooks/use-plan";
-import { Calendar, MapPin, Filter } from "lucide-react";
+import { Calendar, MapPin, Filter, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface Filters {
   maxBudget?: number;
@@ -134,9 +135,38 @@ export default function Tonight() {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <Calendar className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold text-gray-900">Tonight</h1>
+            <div className="flex items-center space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="hidden md:flex items-center space-x-2 p-2 hover:bg-gray-50" data-testid="dropdown-navigation-menu">
+                    <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">T</span>
+                    </div>
+                    <span className="text-xl font-bold text-gray-900">Tonight</span>
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={() => window.location.href = '/'} data-testid="nav-dropdown-search">
+                    🔍 Search
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.location.href = '/tonight'} data-testid="nav-dropdown-tonight">
+                    📅 Tonight
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.location.href = '/plan'} data-testid="nav-dropdown-plan">
+                    📋 My Plan
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.location.href = '/profile'} data-testid="nav-dropdown-profile">
+                    👤 Profile
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              {/* Mobile header */}
+              <div className="flex items-center space-x-2 md:hidden">
+                <Calendar className="h-6 w-6 text-primary" />
+                <h1 className="text-2xl font-bold text-gray-900">Tonight</h1>
+              </div>
             </div>
             <Button
               variant="ghost"

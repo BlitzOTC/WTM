@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { User, Settings, Calendar, MapPin, Bell, LogOut } from "lucide-react";
+import { User, Settings, Calendar, MapPin, Bell, LogOut, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function Profile() {
   const [profileData, setProfileData] = useState({
@@ -42,9 +43,38 @@ export default function Profile() {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-2">
-            <User className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+          <div className="flex items-center space-x-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="hidden md:flex items-center space-x-2 p-2 hover:bg-gray-50" data-testid="dropdown-navigation-menu">
+                  <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">T</span>
+                  </div>
+                  <span className="text-xl font-bold text-gray-900">Tonight</span>
+                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuItem onClick={() => window.location.href = '/'} data-testid="nav-dropdown-search">
+                  🔍 Search
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.location.href = '/tonight'} data-testid="nav-dropdown-tonight">
+                  📅 Tonight
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.location.href = '/plan'} data-testid="nav-dropdown-plan">
+                  📋 My Plan
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.location.href = '/profile'} data-testid="nav-dropdown-profile">
+                  👤 Profile
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            {/* Mobile header */}
+            <div className="flex items-center space-x-2 md:hidden">
+              <User className="h-6 w-6 text-primary" />
+              <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+            </div>
           </div>
           <Button
             variant="ghost"
