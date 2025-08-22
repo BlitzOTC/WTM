@@ -215,36 +215,17 @@ export default function Navigation() {
           </div>
         </div>
 
-        {/* Location & Distance */}
+        {/* Address */}
         <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <h3 className="font-semibold text-gray-900 mb-3">Distance & Location</h3>
-          
-          {locationError ? (
-            <div className="text-center py-4">
-              <MapPin className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-600">{locationError}</p>
+          <h3 className="font-semibold text-gray-900 mb-3">Address</h3>
+          <div className="flex items-start space-x-3">
+            <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
+            <div>
+              <p className="font-medium text-gray-900" data-testid="text-venue-address">
+                {venueCoords.address}
+              </p>
             </div>
-          ) : userLocation && distance !== null ? (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Distance from your location:</span>
-                <span className="font-medium text-gray-900" data-testid="text-distance">
-                  {distance < 0.1 ? '< 0.1 mi' : `${distance.toFixed(1)} mi`}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Estimated travel time:</span>
-                <span className="font-medium text-gray-900">
-                  {Math.max(Math.ceil(distance * 3), 5)} min
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
-              <p className="text-sm text-gray-600">Getting your location...</p>
-            </div>
-          )}
+          </div>
         </div>
 
         {/* Map Options */}
