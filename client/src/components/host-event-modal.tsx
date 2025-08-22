@@ -112,14 +112,14 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="modal-host-event">
         <DialogHeader>
-          <DialogTitle data-testid="text-modal-title">Host an Event</DialogTitle>
+          <DialogTitle data-testid="text-modal-title" className="text-center">Host an Event</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Event Type Selection */}
             <div>
-              <Label className="block text-sm font-medium text-gray-700 mb-3">Event Type</Label>
+              <Label className="block text-sm font-medium text-gray-700 mb-3 text-center">Event Type</Label>
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   type="button"
@@ -163,7 +163,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Event Name</FormLabel>
+                    <FormLabel className="text-center block">Event Name</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., Rooftop Jazz Night" {...field} data-testid="input-event-name" />
                     </FormControl>
@@ -176,7 +176,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 name="venue"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Venue/Location</FormLabel>
+                    <FormLabel className="text-center block">Venue/Location</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., The Skyline Lounge" {...field} data-testid="input-event-venue" />
                     </FormControl>
@@ -188,7 +188,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
 
             {/* Location Search */}
             <div>
-              <Label className="block text-sm font-medium text-gray-700 mb-2">Location Search</Label>
+              <Label className="block text-sm font-medium text-gray-700 mb-2 text-center">Location Search</Label>
               <LocationSearch
                 value={locationInput}
                 onChange={handleLocationChange}
@@ -292,7 +292,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
             {/* Categories and Age Requirements */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="block text-sm font-medium text-gray-700 mb-2">Categories</Label>
+                <Label className="block text-sm font-medium text-gray-700 mb-2 text-center">Categories</Label>
                 <div className="space-y-2">
                   {categories.map((category) => (
                     <div key={category.id} className="flex items-center space-x-2">
@@ -314,7 +314,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 name="ageRequirement"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Age Requirements</FormLabel>
+                    <FormLabel className="text-center block">Age Requirements</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-age-requirement">
@@ -340,7 +340,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                 name="privacy"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Event Privacy</FormLabel>
+                    <FormLabel className="text-center block">Event Privacy</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -373,7 +373,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Event Description</FormLabel>
+                  <FormLabel className="text-center block">Event Description</FormLabel>
                   <FormControl>
                     <Textarea 
                       rows={4}
