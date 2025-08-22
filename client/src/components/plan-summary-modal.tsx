@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, DollarSign, Navigation, Timer, Calendar, Play, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 interface PlanSummaryModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
   const [selectedVariation, setSelectedVariation] = useState<string>("optimized");
   const [nightStarted, setNightStarted] = useState(false);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const formatTime = (timeStr: string) => {
     const [hours, minutes] = timeStr.split(':');
@@ -297,10 +299,11 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
               };
               localStorage.setItem('activeNightPlan', JSON.stringify(nightPlan));
               
-              // Close modal after brief delay to show success state
+              // Navigate to navigation page after brief delay
               setTimeout(() => {
                 onClose();
                 setNightStarted(false);
+                setLocation('/navigation');
               }, 2000);
             }}
             data-testid="button-confirm-start-night"

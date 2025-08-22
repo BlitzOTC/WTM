@@ -14,6 +14,7 @@ import EventsAttended from "@/pages/events-attended";
 import EventsHosted from "@/pages/events-hosted";
 import CitiesExplored from "@/pages/cities-explored";
 import CityEvents from "@/pages/city-events";
+import Navigation from "@/pages/navigation";
 import NotFound from "@/pages/not-found";
 import MobileBottomNav from "@/components/mobile-bottom-nav";
 
@@ -43,6 +44,7 @@ function Router() {
         <Route path="/events-hosted" component={EventsHosted} />
         <Route path="/cities-explored" component={CitiesExplored} />
         <Route path="/city-events" component={CityEvents} />
+        <Route path="/navigation" component={Navigation} />
         <Route component={NotFound} />
       </Switch>
       
