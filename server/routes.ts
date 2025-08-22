@@ -172,6 +172,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { input } = req.query;
       const googleApiKey = process.env.GOOGLE_API_KEY;
       
+      console.log("Google API Key exists:", !!googleApiKey);
+      console.log("Input received:", input);
+      
       if (!googleApiKey) {
         return res.status(500).json({ message: "Google API key not configured" });
       }
@@ -181,7 +184,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=(cities)&key=${googleApiKey}`
+        `https://places.googleapis.com/v1/places:autocomplete`, 
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': googleApiKey
+          },
+          body: JSON.stringify({
+            input: input,
+            includedPrimaryTypes: ['locality', 'administrative_area_level_1'],
+            languageCode: 'en'
+          })
+        }
       );
       
       if (!response.ok) {
@@ -189,7 +204,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const data = await response.json();
-      res.json(data);
+      
+      // Transform new API response to match old format for frontend compatibility
+      const transformedData = {
+        status: 'OK',
+        predictions: data.suggestions?.map((suggestion: any) => ({
+          place_id: suggestion.placePrediction?.placeId || suggestion.queryPrediction?.text,
+          description: suggestion.placePrediction?.text?.text || suggestion.queryPrediction?.text,
+          structured_formatting: {
+            main_text: suggestion.placePrediction?.structuredFormat?.mainText?.text || suggestion.queryPrediction?.text?.split(',')[0] || '',
+            secondary_text: suggestion.placePrediction?.structuredFormat?.secondaryText?.text || suggestion.queryPrediction?.text?.split(',').slice(1).join(',') || ''
+          }
+        })) || []
+      };
+      
+      res.json(transformedData);
     } catch (error) {
       console.error("Places autocomplete error:", error);
       res.status(500).json({ message: "Failed to fetch place suggestions" });
