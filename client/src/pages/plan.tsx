@@ -17,7 +17,7 @@ export default function Plan() {
   // Format total cost
   const formatTotalCost = (cost: number) => {
     if (cost === 0) return "FREE";
-    return `$${(cost / 100).toFixed(0)}`;
+    return `${(cost / 100).toFixed(0)}`;
   };
 
   // Calculate estimated time span
