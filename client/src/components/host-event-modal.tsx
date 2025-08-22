@@ -34,6 +34,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
   const [eventType, setEventType] = useState<'venue' | 'personal'>('venue');
   const [locationInput, setLocationInput] = useState("");
   const [customCategory, setCustomCategory] = useState("");
+  const [showCustomInput, setShowCustomInput] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -328,12 +329,19 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="category-other"
-                        checked={customCategory.trim() !== "" && form.watch('categories')?.includes(customCategory.trim())}
+                        checked={showCustomInput}
                         onCheckedChange={(checked) => {
-                          if (checked && customCategory.trim()) {
-                            handleCustomCategoryChange(true);
+                          setShowCustomInput(checked as boolean);
+                          if (checked) {
+                            // Show input, but don't add to categories yet
                           } else {
-                            handleCustomCategoryChange(false);
+                            // Hide input and remove custom category if it exists
+                            if (customCategory.trim()) {
+                              const currentCategories = form.getValues('categories') || [];
+                              const newCategories = currentCategories.filter(id => id !== customCategory.trim());
+                              form.setValue('categories', newCategories);
+                            }
+                            setCustomCategory("");
                           }
                         }}
                         data-testid="checkbox-host-category-other"
@@ -342,27 +350,34 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                         🏷️ Other
                       </Label>
                     </div>
-                    <Input
-                      placeholder="Type your category..."
-                      value={customCategory}
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        const oldValue = customCategory.trim();
-                        setCustomCategory(newValue);
-                        
-                        // Update categories if there was an old value
-                        if (oldValue && form.watch('categories')?.includes(oldValue)) {
-                          const currentCategories = form.getValues('categories') || [];
-                          const newCategories = currentCategories.filter(id => id !== oldValue);
-                          if (newValue.trim()) {
-                            newCategories.push(newValue.trim());
+                    {showCustomInput && (
+                      <Input
+                        placeholder="Type your category..."
+                        value={customCategory}
+                        onChange={(e) => {
+                          const newValue = e.target.value;
+                          const oldValue = customCategory.trim();
+                          setCustomCategory(newValue);
+                          
+                          // Update categories if there was an old value
+                          if (oldValue && form.watch('categories')?.includes(oldValue)) {
+                            const currentCategories = form.getValues('categories') || [];
+                            const newCategories = currentCategories.filter(id => id !== oldValue);
+                            if (newValue.trim()) {
+                              newCategories.push(newValue.trim());
+                            }
+                            form.setValue('categories', newCategories);
+                          } else if (newValue.trim()) {
+                            // Add new custom category
+                            const currentCategories = form.getValues('categories') || [];
+                            const newCategories = [...currentCategories, newValue.trim()];
+                            form.setValue('categories', newCategories);
                           }
-                          form.setValue('categories', newCategories);
-                        }
-                      }}
-                      className="ml-6 text-sm"
-                      data-testid="input-custom-category"
-                    />
+                        }}
+                        className="ml-6 text-sm"
+                        data-testid="input-custom-category"
+                      />
+                    )}
                   </div>
                 </div>
               </div>
