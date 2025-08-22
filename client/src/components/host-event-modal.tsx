@@ -89,7 +89,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
     createEventMutation.mutate({
       ...data,
       eventType,
-      price: Math.round(data.price * 100) // Convert to cents
+      price: Math.round((data.price || 0) * 100) // Convert to cents
     });
   };
 
@@ -221,7 +221,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">Address</FormLabel>
                     <FormControl>
-                      <Input placeholder="123 Main St" {...field} data-testid="input-event-address" className="text-center" />
+                      <Input placeholder="123 Main St" {...field} value={field.value || ""} data-testid="input-event-address" className="text-center" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -264,7 +264,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">Start Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} data-testid="input-event-start-time" className="text-center [&::-webkit-datetime-edit]:text-center [&::-webkit-datetime-edit-fields-wrapper]:justify-center [&::-webkit-datetime-edit-hour-field]:text-center [&::-webkit-datetime-edit-minute-field]:text-center [&::-webkit-datetime-edit-ampm-field]:text-center" style={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }} />
+                      <Input type="time" {...field} value={field.value || ""} data-testid="input-event-start-time" className="text-center [&::-webkit-datetime-edit]:text-center [&::-webkit-datetime-edit-fields-wrapper]:justify-center [&::-webkit-datetime-edit-hour-field]:text-center [&::-webkit-datetime-edit-minute-field]:text-center [&::-webkit-datetime-edit-ampm-field]:text-center" style={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -277,7 +277,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">End Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} data-testid="input-event-end-time" className="text-center [&::-webkit-datetime-edit]:text-center [&::-webkit-datetime-edit-fields-wrapper]:justify-center [&::-webkit-datetime-edit-hour-field]:text-center [&::-webkit-datetime-edit-minute-field]:text-center [&::-webkit-datetime-edit-ampm-field]:text-center" style={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }} />
+                      <Input type="time" {...field} value={field.value || ""} data-testid="input-event-end-time" className="text-center [&::-webkit-datetime-edit]:text-center [&::-webkit-datetime-edit-fields-wrapper]:justify-center [&::-webkit-datetime-edit-hour-field]:text-center [&::-webkit-datetime-edit-minute-field]:text-center [&::-webkit-datetime-edit-ampm-field]:text-center" style={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -405,39 +405,39 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
               />
             </div>
 
-            {/* Privacy (for personal events) */}
-            {eventType === 'personal' && (
-              <FormField
-                control={form.control}
-                name="privacy"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-center block">Event Privacy</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="space-y-2"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="public" id="privacy-public" data-testid="radio-privacy-public" />
-                          <Label htmlFor="privacy-public">🌎 Public - Anyone can see and join</Label>
+            {/* Event Privacy */}
+            <FormField
+              control={form.control}
+              name="privacy"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-center block">Event Privacy</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value || "public"}
+                      className="space-y-3"
+                    >
+                      <div className="flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <RadioGroupItem value="public" id="privacy-public" data-testid="radio-privacy-public" className="mt-1" />
+                        <div className="flex-1">
+                          <Label htmlFor="privacy-public" className="font-medium text-gray-900">🌎 Public Event</Label>
+                          <p className="text-sm text-gray-600 mt-1">Anyone can see this event and join</p>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="friends" id="privacy-friends" data-testid="radio-privacy-friends" />
-                          <Label htmlFor="privacy-friends">👥 Friends Only - Only your friends can see</Label>
+                      </div>
+                      <div className="flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <RadioGroupItem value="private" id="privacy-private" data-testid="radio-privacy-private" className="mt-1" />
+                        <div className="flex-1">
+                          <Label htmlFor="privacy-private" className="font-medium text-gray-900">🔒 Private Event</Label>
+                          <p className="text-sm text-gray-600 mt-1">Only your friends can see this event, or people you share the link with</p>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="invite" id="privacy-invite" data-testid="radio-privacy-invite" />
-                          <Label htmlFor="privacy-invite">📨 Invite Only - Send specific invitations</Label>
-                        </div>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Description */}
             <div className="pt-4">
@@ -452,6 +452,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                         rows={4}
                         placeholder="Tell people what makes this event special..."
                         {...field}
+                        value={field.value || ""}
                         data-testid="textarea-event-description"
                         className="text-center"
                       />

@@ -27,7 +27,7 @@ export const events = pgTable("events", {
   dressCode: text("dress_code"),
   categories: jsonb("categories").notNull().default("[]"), // array of strings
   eventType: text("event_type").notNull().default("venue"), // "venue" or "personal"
-  privacy: text("privacy").default("public"), // "public", "friends", "invite"
+  privacy: text("privacy").default("public"), // "public", "private"
   hostId: varchar("host_id").notNull(),
   maxCapacity: integer("max_capacity"),
   currentAttendees: integer("current_attendees").default(0),
