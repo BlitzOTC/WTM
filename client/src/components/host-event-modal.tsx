@@ -134,7 +134,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Event Type Selection */}
             <div>
-              <Label className="block text-sm font-medium text-gray-700 mb-3 text-center">Event Type</Label>
+              <Label className="block text-sm font-medium text-black mb-3 text-center">Event Type</Label>
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   type="button"
@@ -148,7 +148,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   data-testid="button-event-type-venue"
                 >
                   <div>
-                    <div className="font-medium text-gray-900 text-center">🏢 Venue Event</div>
+                    <div className="font-medium text-black text-center">🏢 Venue Event</div>
                     <div className="text-sm text-gray-700 font-medium">Bar, Club, Etc...</div>
                   </div>
                 </Button>
@@ -164,7 +164,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   data-testid="button-event-type-personal"
                 >
                   <div className="px-4">
-                    <div className="font-medium text-gray-900 text-center">🎉 Personal Event</div>
+                    <div className="font-medium text-black text-center">🎉 Personal Event</div>
                     <div className="text-sm text-gray-700 font-medium text-center px-4 py-1">Party, Gathering, Etc...</div>
                   </div>
                 </Button>
@@ -203,7 +203,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
 
             {/* Location Search */}
             <div>
-              <Label className="block text-sm font-medium text-gray-700 mb-2 text-center">Location Search</Label>
+              <Label className="block text-sm font-medium text-black mb-2 text-center">Location Search</Label>
               <LocationSearch
                 value={locationInput}
                 onChange={handleLocationChange}
