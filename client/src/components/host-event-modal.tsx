@@ -163,9 +163,9 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   }`}
                   data-testid="button-event-type-personal"
                 >
-                  <div>
+                  <div className="px-2">
                     <div className="font-medium text-gray-900 text-center">🎉 Personal Event</div>
-                    <div className="text-sm text-gray-700 font-medium text-center">Party, Gathering, Etc...</div>
+                    <div className="text-sm text-gray-700 font-medium text-center px-2">Party, Gathering, Etc...</div>
                   </div>
                 </Button>
               </div>
