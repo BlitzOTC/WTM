@@ -166,6 +166,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Google Places Autocomplete proxy endpoint
+  app.get("/api/places/autocomplete", async (req, res) => {
+    try {
+      const { input } = req.query;
+      const googleApiKey = process.env.GOOGLE_API_KEY;
+      
+      if (!googleApiKey) {
+        return res.status(500).json({ message: "Google API key not configured" });
+      }
+      
+      if (!input || typeof input !== 'string') {
+        return res.status(400).json({ message: "Input parameter is required" });
+      }
+      
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=(cities)&key=${googleApiKey}`
+      );
+      
+      if (!response.ok) {
+        return res.status(response.status).json({ message: "Google API request failed" });
+      }
+      
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error("Places autocomplete error:", error);
+      res.status(500).json({ message: "Failed to fetch place suggestions" });
+    }
+  });
+
   // Search by location
   app.get("/api/search", async (req, res) => {
     try {
