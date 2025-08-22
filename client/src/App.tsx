@@ -8,6 +8,8 @@ import Home from "@/pages/home";
 import Tonight from "@/pages/tonight";
 import Plan from "@/pages/plan";
 import Profile from "@/pages/profile";
+import Followers from "@/pages/followers";
+import Following from "@/pages/following";
 import NotFound from "@/pages/not-found";
 import MobileBottomNav from "@/components/mobile-bottom-nav";
 
@@ -31,6 +33,8 @@ function Router() {
         <Route path="/tonight" component={Tonight} />
         <Route path="/plan" component={Plan} />
         <Route path="/profile" component={Profile} />
+        <Route path="/followers" component={Followers} />
+        <Route path="/following" component={Following} />
         <Route component={NotFound} />
       </Switch>
       
