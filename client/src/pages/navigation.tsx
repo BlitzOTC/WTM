@@ -208,7 +208,7 @@ export default function Navigation() {
               <div className="flex items-center space-x-2">
                 <DollarSign className="h-4 w-4 text-gray-500" />
                 <span className="text-gray-600">
-                  {currentEvent.price === 0 ? 'Free' : `$${(currentEvent.price / 100).toFixed(0)}`}
+                  {currentEvent.price === 0 ? 'Free' : `${(currentEvent.price / 100).toFixed(0)}`}
                 </span>
               </div>
             </div>

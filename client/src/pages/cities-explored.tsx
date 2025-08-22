@@ -1,4 +1,4 @@
-import { ArrowLeft, MapPin, Calendar, Users, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Users, Clock, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 
@@ -157,9 +157,10 @@ export default function CitiesExplored() {
               
               <div className="pt-3 border-t border-gray-100">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-600">
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <DollarSign className="h-4 w-4" />
                     <span className="font-medium" data-testid={`text-total-spent-${city.id}`}>
-                      Total spent: ${city.totalSpent}
+                      {city.totalSpent}
                     </span>
                   </div>
                   <Button 

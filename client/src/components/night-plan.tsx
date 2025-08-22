@@ -1,5 +1,5 @@
 import { type Event } from "@shared/schema";
-import { X, MapPin } from "lucide-react";
+import { X, MapPin, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -74,9 +74,12 @@ export default function NightPlan({ selectedEvents, totalBudget, onRemoveEvent }
           
           <div className="border-t pt-4">
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-600">Total Budget:</span>
+              <div className="flex items-center space-x-2">
+                <DollarSign className="h-4 w-4 text-gray-500" />
+                <span className="text-gray-600">Total Budget:</span>
+              </div>
               <span className="font-medium text-gray-900" data-testid="text-total-budget">
-                ${totalBudget.toFixed(2)}
+                {totalBudget.toFixed(2)}
               </span>
             </div>
             <Button

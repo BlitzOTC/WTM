@@ -7,6 +7,10 @@ This is a full-stack nightlife and event discovery application built with a mode
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+UI/UX Preferences: 
+- No duplicate dollar signs in price displays - use DollarSign icon + number format consistently
+- 12-hour time format throughout the application
+- Clean, consistent pricing displays with DollarSign icon when showing monetary values
 
 ## System Architecture
 

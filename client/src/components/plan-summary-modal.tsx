@@ -42,7 +42,7 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
 
   const formatCost = (cost: number) => {
     if (cost === 0) return "FREE";
-    return `$${(cost / 100).toFixed(0)}`;
+    return `${(cost / 100).toFixed(0)}`;
   };
 
   const formatTotalCost = (cost: number) => {
@@ -223,7 +223,10 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
                       </div>
                       
                       <div className="text-right">
-                        <div className="font-medium text-gray-900">{formatCost(event.price)}</div>
+                        <div className="flex items-center space-x-1">
+                          <DollarSign className="h-4 w-4 text-gray-500" />
+                          <span className="font-medium text-gray-900">{formatCost(event.price)}</span>
+                        </div>
                         {event.ageRequirement && (
                           <Badge variant="secondary" className="text-xs">
                             {event.ageRequirement}
