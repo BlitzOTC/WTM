@@ -4,7 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, DollarSign, Navigation, Timer, Calendar } from "lucide-react";
+import { Clock, MapPin, DollarSign, Navigation, Timer, Calendar, Play, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PlanSummaryModalProps {
   isOpen: boolean;
@@ -26,6 +27,8 @@ interface RouteVariation {
 
 export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummaryModalProps) {
   const [selectedVariation, setSelectedVariation] = useState<string>("optimized");
+  const [nightStarted, setNightStarted] = useState(false);
+  const { toast } = useToast();
 
   const formatTime = (timeStr: string) => {
     const [hours, minutes] = timeStr.split(':');
@@ -276,11 +279,44 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
             className="flex-1 bg-green-600 text-white hover:bg-green-700"
             onClick={() => {
               console.log('Starting night with route:', selectedRoute.name);
-              onClose();
+              setNightStarted(true);
+              
+              // Show success notification
+              toast({
+                title: "Night Started! 🎉",
+                description: `Your ${selectedRoute.name} route is now active. Have an amazing night!`,
+              });
+              
+              // Store the active night plan in localStorage for persistence
+              const nightPlan = {
+                route: selectedRoute,
+                startedAt: new Date().toISOString(),
+                events: selectedRoute.events,
+                currentEventIndex: 0,
+                status: 'active'
+              };
+              localStorage.setItem('activeNightPlan', JSON.stringify(nightPlan));
+              
+              // Close modal after brief delay to show success state
+              setTimeout(() => {
+                onClose();
+                setNightStarted(false);
+              }, 2000);
             }}
             data-testid="button-confirm-start-night"
+            disabled={nightStarted}
           >
-            Start with {selectedRoute.name}
+            {nightStarted ? (
+              <>
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Night Started!
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Start with {selectedRoute.name}
+              </>
+            )}
           </Button>
         </div>
       </DialogContent>

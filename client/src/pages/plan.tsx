@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { type Event } from "@shared/schema";
 import EventCard from "@/components/event-card";
 import PlanSummaryModal from "@/components/plan-summary-modal";
-import { BookOpen, MapPin, Clock, DollarSign, ChevronDown } from "lucide-react";
+import { BookOpen, MapPin, Clock, DollarSign, ChevronDown, Play, Navigation, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { usePlan } from "@/hooks/use-plan";
+import { Badge } from "@/components/ui/badge";
 
 export default function Plan() {
   const { events: selectedEvents, removeEvent, clearPlan } = usePlan();
   const [showPlanSummary, setShowPlanSummary] = useState(false);
+  const [activeNightPlan, setActiveNightPlan] = useState<any>(null);
 
   // Calculate total cost
   const totalCost = selectedEvents.reduce((sum, event) => sum + event.price, 0);
@@ -56,6 +58,42 @@ export default function Plan() {
     console.log('Optimizing route for:', selectedEvents.length, 'events');
   };
 
+  // Check for active night plan on component mount and periodically
+  useEffect(() => {
+    const checkActiveNightPlan = () => {
+      const storedPlan = localStorage.getItem('activeNightPlan');
+      if (storedPlan) {
+        try {
+          const plan = JSON.parse(storedPlan);
+          setActiveNightPlan(plan);
+        } catch (error) {
+          console.error('Error parsing active night plan:', error);
+          localStorage.removeItem('activeNightPlan');
+        }
+      }
+    };
+
+    checkActiveNightPlan();
+    const interval = setInterval(checkActiveNightPlan, 30000); // Check every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleEndNight = () => {
+    localStorage.removeItem('activeNightPlan');
+    setActiveNightPlan(null);
+  };
+
+  const handleMarkEventCompleted = (eventIndex: number) => {
+    if (activeNightPlan) {
+      const updatedPlan = {
+        ...activeNightPlan,
+        currentEventIndex: eventIndex + 1
+      };
+      setActiveNightPlan(updatedPlan);
+      localStorage.setItem('activeNightPlan', JSON.stringify(updatedPlan));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 pb-20">
       <div className="max-w-md mx-auto">
@@ -96,6 +134,79 @@ export default function Plan() {
           </div>
           <p className="text-gray-600 md:ml-14">Your curated night out</p>
         </div>
+
+        {/* Active Night Plan */}
+        {activeNightPlan && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <Play className="h-5 w-5 text-green-600" />
+                <h3 className="font-semibold text-green-800">Night in Progress</h3>
+                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  {activeNightPlan.route.name}
+                </Badge>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleEndNight}
+                className="text-red-600 border-red-200 hover:bg-red-50"
+                data-testid="button-end-night"
+              >
+                End Night
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              {activeNightPlan.events.map((event: Event, index: number) => (
+                <div 
+                  key={event.id} 
+                  className={`flex items-center justify-between p-3 rounded-lg ${
+                    index < activeNightPlan.currentEventIndex 
+                      ? 'bg-green-100 opacity-75' 
+                      : index === activeNightPlan.currentEventIndex 
+                        ? 'bg-blue-100 border-2 border-blue-300' 
+                        : 'bg-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    {index < activeNightPlan.currentEventIndex ? (
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    ) : index === activeNightPlan.currentEventIndex ? (
+                      <AlertCircle className="h-5 w-5 text-blue-600" />
+                    ) : (
+                      <Clock className="h-5 w-5 text-gray-400" />
+                    )}
+                    <div>
+                      <div className="font-medium text-gray-900" data-testid={`text-active-event-${event.id}`}>
+                        {event.name}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {event.startTime} • {event.venue}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {index === activeNightPlan.currentEventIndex && (
+                    <Button 
+                      size="sm"
+                      onClick={() => handleMarkEventCompleted(index)}
+                      data-testid={`button-complete-event-${event.id}`}
+                    >
+                      Complete
+                    </Button>
+                  )}
+                  
+                  {index < activeNightPlan.currentEventIndex && (
+                    <Badge variant="secondary" className="bg-green-100 text-green-800">
+                      Completed
+                    </Badge>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {selectedEvents.length === 0 ? (
           <div className="text-center py-12">
