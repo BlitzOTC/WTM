@@ -172,7 +172,7 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <DollarSign className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-500">💰</span>
                     <div>
                       <div className="font-medium">{formatTotalCost(variation.totalCost)}</div>
                       <div className="text-gray-500">Total cost</div>
