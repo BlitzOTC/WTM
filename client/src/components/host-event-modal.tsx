@@ -241,7 +241,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
             </div>
 
             {/* Time and Price */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="startTime"
@@ -281,6 +281,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         data-testid="input-event-price"
+                        className="text-center"
                       />
                     </FormControl>
                     <FormMessage />
@@ -368,24 +369,26 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
             )}
 
             {/* Description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-center block">Event Description</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      rows={4}
-                      placeholder="Tell people what makes this event special..."
-                      {...field}
-                      data-testid="textarea-event-description"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="pt-4">
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-center block">Event Description</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        rows={4}
+                        placeholder="Tell people what makes this event special..."
+                        {...field}
+                        data-testid="textarea-event-description"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Submit Buttons */}
             <div className="flex space-x-3 pt-4">
