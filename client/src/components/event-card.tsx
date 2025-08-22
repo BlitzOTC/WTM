@@ -45,7 +45,7 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
   const categories = Array.isArray(event.categories) ? event.categories : [];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow relative">
       <img 
         src={event.imageUrl || "https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=240"} 
         alt={event.name}
@@ -53,7 +53,7 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
         data-testid={`img-event-${event.id}`}
       />
       
-      <div className="p-5">
+      <div className="p-5 pb-16">
         <div className="flex items-start justify-between mb-3">
           <div>
             <h3 className="font-semibold text-gray-900 mb-1" data-testid={`text-event-name-${event.id}`}>
@@ -101,7 +101,10 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
             </Badge>
           )}
         </div>
-        
+      </div>
+      
+      {/* Fixed positioned buttons at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-5 bg-white">
         <div className="flex space-x-2">
           <Button
             onClick={() => onAddToPlan(event)}
