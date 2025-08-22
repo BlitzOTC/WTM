@@ -3,13 +3,55 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertEventSchema, insertNightPlanSchema } from "@shared/schema";
 import { z } from "zod";
+import GooglePlacesService from "./google-places";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Event routes
   app.get("/api/events", async (req, res) => {
     try {
-      const { city, state, categories, ageRequirement, maxPrice, minPrice, eventType } = req.query;
+      const { city, state, categories, ageRequirement, maxPrice, minPrice, eventType, location } = req.query;
       
+      // If Google API key is available and location is provided, fetch real events
+      const googleApiKey = process.env.GOOGLE_API_KEY;
+      if (googleApiKey && location) {
+        try {
+          const googlePlaces = new GooglePlacesService(googleApiKey);
+          const realEvents = await googlePlaces.searchEvents(location as string);
+          
+          // Apply filters to real events
+          let filteredEvents = realEvents;
+          
+          if (categories) {
+            const categoryArray = typeof categories === 'string' ? [categories] : categories as string[];
+            filteredEvents = filteredEvents.filter(event => 
+              categoryArray.some(cat => event.categories.includes(cat))
+            );
+          }
+          
+          if (ageRequirement && ageRequirement !== 'all') {
+            filteredEvents = filteredEvents.filter(event => 
+              event.ageRequirement === ageRequirement || event.ageRequirement === 'all'
+            );
+          }
+          
+          if (maxPrice) {
+            const maxPriceCents = parseFloat(maxPrice as string) * 100;
+            filteredEvents = filteredEvents.filter(event => event.price <= maxPriceCents);
+          }
+          
+          if (minPrice) {
+            const minPriceCents = parseFloat(minPrice as string) * 100;
+            filteredEvents = filteredEvents.filter(event => event.price >= minPriceCents);
+          }
+          
+          return res.json(filteredEvents);
+        } catch (googleError) {
+          console.error("Google Places API error:", googleError);
+          // Fall back to storage events if Google API fails
+        }
+      }
+      
+      // Fallback to storage events (existing functionality)
       const filters: any = {};
       if (city) filters.city = city as string;
       if (state) filters.state = state as string;
@@ -24,6 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const events = await storage.getEvents(filters);
       res.json(events);
     } catch (error) {
+      console.error("Events API error:", error);
       res.status(500).json({ message: "Failed to fetch events" });
     }
   });

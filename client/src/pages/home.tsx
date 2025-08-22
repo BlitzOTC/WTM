@@ -24,7 +24,7 @@ interface Filters {
 }
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState("San Francisco, CA");
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<Filters>({
     categories: [],
     ageRequirements: [],
@@ -51,6 +51,8 @@ export default function Home() {
 
   // Build query parameters
   const queryParams = new URLSearchParams();
+  // Add location for Google Places API
+  queryParams.append('location', searchQuery);
   if (city) queryParams.append('city', city);
   if (state) queryParams.append('state', state);
   if (filters.categories.length > 0) {
@@ -75,7 +77,8 @@ export default function Home() {
       const response = await fetch(`/api/events?${queryParams}`);
       if (!response.ok) throw new Error('Failed to fetch events');
       return response.json();
-    }
+    },
+    enabled: !!searchQuery // Only run query when we have a search location
   });
 
   // Calculate recommendation score for each event
@@ -180,13 +183,11 @@ export default function Home() {
               </DropdownMenu>
             </div>
 
-            {/* Location Search */}
-            <div className="hidden md:flex flex-1 max-w-lg mx-8">
-              <LocationSearch
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Enter city, state..."
-              />
+            {/* Center Title */}
+            <div className="hidden md:flex flex-1 justify-center">
+              <h1 className="text-xl font-semibold text-gray-900">
+                {searchQuery ? `Events in ${searchQuery}` : 'Tonight - Find Real Events'}
+              </h1>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -218,14 +219,23 @@ export default function Home() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Mobile Location Search */}
-        <div className="md:hidden mb-4">
-          <LocationSearch
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Enter city, state..."
-          />
-        </div>
+        {/* Mobile header for search location */}
+        {searchQuery && (
+          <div className="md:hidden mb-4">
+            <div className="bg-white rounded-lg p-4 shadow-sm border">
+              <p className="text-sm text-gray-600">Current location:</p>
+              <p className="font-medium text-gray-900">{searchQuery}</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setSearchQuery("")}
+                className="mt-2"
+              >
+                Change Location
+              </Button>
+            </div>
+          </div>
+        )}
         
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Filter Sidebar */}
@@ -245,33 +255,49 @@ export default function Home() {
 
           {/* Main Content */}
           <main className="flex-1">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900" data-testid="text-page-title">
-                  What's Happening Tonight
-                </h1>
-                <p className="text-gray-600" data-testid="text-location-count">
-                  {searchQuery} • {events.length} events found
-                </p>
+            {/* Show location search if no location is set */}
+            {!searchQuery ? (
+              <div className="text-center py-16">
+                <h1 className="text-3xl font-bold text-gray-900 mb-4">Find Real Events Near You</h1>
+                <p className="text-gray-600 mb-8">Search for live events in any city using Google's real-time data</p>
+                <div className="max-w-md mx-auto">
+                  <LocationSearch
+                    onLocationSelect={(location) => {
+                      setSearchQuery(location);
+                    }}
+                    isLoading={isLoading}
+                  />
+                </div>
               </div>
-              
-              <div className="flex items-center space-x-3">
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-48" data-testid="select-sort-by">
-                    <SelectValue placeholder="Sort by..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="recommended">Recommended for You</SelectItem>
-                    <SelectItem value="time">Sort by Time</SelectItem>
-                    <SelectItem value="price">Sort by Price</SelectItem>
-                    <SelectItem value="popularity">Sort by Popularity</SelectItem>
-                    <SelectItem value="distance">Sort by Distance</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900" data-testid="text-page-title">
+                      What's Happening Tonight
+                    </h1>
+                    <p className="text-gray-600" data-testid="text-location-count">
+                      {searchQuery} • {events.length} events found
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-48" data-testid="select-sort-by">
+                        <SelectValue placeholder="Sort by..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="recommended">Recommended for You</SelectItem>
+                        <SelectItem value="time">Sort by Time</SelectItem>
+                        <SelectItem value="price">Sort by Price</SelectItem>
+                        <SelectItem value="popularity">Sort by Popularity</SelectItem>
+                        <SelectItem value="distance">Sort by Distance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
-            {isLoading ? (
+                {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
@@ -305,7 +331,9 @@ export default function Home() {
                     data-testid={`card-event-${event.id}`}
                   />
                 ))}
-              </div>
+                </div>
+              )}
+              </>
             )}
           </main>
         </div>

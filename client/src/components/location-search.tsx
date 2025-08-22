@@ -1,201 +1,139 @@
-import { useState, useEffect, useRef } from "react";
-import { Search, MapPin, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { MapPin, Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface LocationSuggestion {
-  place_id: string;
-  display_name: string;
-  lat: string;
-  lon: string;
-  address: {
-    city?: string;
-    state?: string;
-    country?: string;
-    country_code?: string;
-  };
-}
+import { Input } from "@/components/ui/input";
 
 interface LocationSearchProps {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
+  onLocationSelect: (location: string) => void;
+  isLoading?: boolean;
 }
 
-export default function LocationSearch({ value, onChange, placeholder = "Search any city worldwide..." }: LocationSearchProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [inputValue, setInputValue] = useState(value);
-  const debounceRef = useRef<NodeJS.Timeout>();
-  const containerRef = useRef<HTMLDivElement>(null);
+export default function LocationSearch({ onLocationSelect, isLoading = false }: LocationSearchProps) {
+  const [location, setLocation] = useState("");
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Sync with parent value
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
-
-  const searchLocations = async (query: string) => {
-    if (query.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // Using Nominatim (OpenStreetMap) geocoding service - free and no API key required
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&limit=8&q=${encodeURIComponent(query)}&addressdetails=1&accept-language=en`
-      );
-      
-      if (response.ok) {
-        const data = await response.json();
-        const formattedSuggestions = data
-          .filter((item: any) => item.address && (item.address.city || item.address.town || item.address.village || item.address.county))
-          .map((item: any) => ({
-            place_id: item.place_id,
-            display_name: item.display_name,
-            lat: item.lat,
-            lon: item.lon,
-            address: {
-              city: item.address.city || item.address.town || item.address.village || item.address.county,
-              state: item.address.state || item.address.province || item.address.region,
-              country: item.address.country,
-              country_code: item.address.country_code
-            }
-          }));
-        setSuggestions(formattedSuggestions);
-      }
-    } catch (error) {
-      console.error('Location search failed:', error);
-      setSuggestions([]);
-    } finally {
-      setIsLoading(false);
+  const handleSearch = () => {
+    if (location.trim()) {
+      onLocationSelect(location.trim());
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    
-    // Clear existing debounce
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-
-    // Debounce search for 300ms
-    debounceRef.current = setTimeout(() => {
-      searchLocations(newValue);
-      setIsOpen(true);
-    }, 300);
-  };
-
-  const handleSuggestionClick = (suggestion: LocationSuggestion) => {
-    let formattedLocation = suggestion.address.city || '';
-    if (suggestion.address.state) {
-      formattedLocation += `, ${suggestion.address.state}`;
-    }
-    if (suggestion.address.country && suggestion.address.country !== 'United States') {
-      formattedLocation += `, ${suggestion.address.country}`;
-    }
-    setInputValue(formattedLocation);
-    onChange(formattedLocation);
-    setIsOpen(false);
-    setSuggestions([]);
-  };
-
-  const handleInputSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      onChange(inputValue);
-      setIsOpen(false);
-    }
-    if (e.key === 'Escape') {
-      setIsOpen(false);
+      handleSearch();
     }
   };
 
-  const clearInput = () => {
-    setInputValue('');
-    onChange('');
-    setSuggestions([]);
-    setIsOpen(false);
+  const getCurrentLocation = () => {
+    setIsGettingLocation(true);
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            // Use reverse geocoding to get address
+            const response = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${import.meta.env.VITE_GOOGLE_API_KEY}`
+            );
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data.results && data.results.length > 0) {
+                const address = data.results[0].formatted_address;
+                setLocation(address);
+                onLocationSelect(address);
+              } else {
+                // Fallback to coordinates if reverse geocoding fails
+                const coordsLocation = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+                setLocation(coordsLocation);
+                onLocationSelect(coordsLocation);
+              }
+            } else {
+              // If reverse geocoding fails, use coordinates
+              const coordsLocation = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+              setLocation(coordsLocation);
+              onLocationSelect(coordsLocation);
+            }
+          } catch (error) {
+            console.error('Reverse geocoding error:', error);
+            // Use coordinates as fallback
+            const { latitude, longitude } = position.coords;
+            const coordsLocation = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+            setLocation(coordsLocation);
+            onLocationSelect(coordsLocation);
+          } finally {
+            setIsGettingLocation(false);
+          }
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          setIsGettingLocation(false);
+          alert('Unable to get your location. Please enter a city or address manually.');
+        }
+      );
+    } else {
+      setIsGettingLocation(false);
+      alert('Geolocation is not supported by this browser.');
+    }
   };
 
   return (
-    <div ref={containerRef} className="relative w-full">
+    <div className="space-y-4">
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
-        </div>
         <Input
           type="text"
-          placeholder={placeholder}
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleInputSubmit}
-          onFocus={() => {
-            if (suggestions.length > 0) setIsOpen(true);
-          }}
-          className="pl-10 pr-10"
+          placeholder="Enter city, address, or neighborhood..."
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          onKeyPress={handleKeyPress}
+          className="pl-10 pr-4 py-3 text-lg"
+          disabled={isLoading || isGettingLocation}
           data-testid="input-location-search"
         />
-        {inputValue && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute inset-y-0 right-0 px-2 h-full"
-            onClick={clearInput}
-            data-testid="button-clear-location"
-          >
-            <X className="h-4 w-4 text-gray-400" />
-          </Button>
-        )}
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
       </div>
-
-      {/* Dropdown suggestions */}
-      {isOpen && (suggestions.length > 0 || isLoading) && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+      
+      <div className="flex space-x-3">
+        <Button
+          onClick={handleSearch}
+          disabled={!location.trim() || isLoading || isGettingLocation}
+          className="flex-1 bg-primary text-white hover:bg-indigo-700"
+          data-testid="button-search-events"
+        >
           {isLoading ? (
-            <div className="px-4 py-3 text-sm text-gray-500" data-testid="text-loading-locations">
-              Searching locations...
-            </div>
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Searching...
+            </>
           ) : (
-            suggestions.map((suggestion) => (
-              <button
-                key={suggestion.place_id}
-                onClick={() => handleSuggestionClick(suggestion)}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 focus:bg-gray-50 focus:outline-none"
-                data-testid={`button-location-suggestion-${suggestion.place_id}`}
-              >
-                <div className="flex items-center space-x-3">
-                  <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 truncate">
-                      {suggestion.address.city}
-                      {suggestion.address.state && `, ${suggestion.address.state}`}
-                    </div>
-                    <div className="text-xs text-gray-500 truncate">
-                      {suggestion.address.country}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            ))
+            <>
+              <Search className="h-4 w-4 mr-2" />
+              Search Events
+            </>
           )}
-        </div>
-      )}
+        </Button>
+        
+        <Button
+          onClick={getCurrentLocation}
+          disabled={isLoading || isGettingLocation}
+          variant="outline"
+          className="px-4"
+          data-testid="button-current-location"
+        >
+          {isGettingLocation ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <MapPin className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+      
+      <div className="text-center">
+        <p className="text-sm text-gray-600">
+          Search for real events in any city or use your current location
+        </p>
+      </div>
     </div>
   );
 }
