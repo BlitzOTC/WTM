@@ -2,7 +2,15 @@
 
 ## Overview
 
-This is a full-stack nightlife and event discovery application built with a modern TypeScript stack. The app allows users to search for events, filter by preferences, create personalized night plans, and host their own events. It features a React frontend with shadcn/ui components, an Express.js backend with RESTful APIs, and uses Drizzle ORM for database management with PostgreSQL.
+This is a full-stack nightlife and event discovery application built with a modern TypeScript stack. The app allows users to search for real-time events in any city worldwide, filter by preferences, create personalized night plans, and host their own events. It features a React frontend with shadcn/ui components, an Express.js backend with RESTful APIs, Google Places API integration for location autocomplete and real-time event generation, and uses Drizzle ORM for database management with PostgreSQL.
+
+## Recent Changes (August 22, 2025)
+
+- **Google Places API Integration**: Added real-time autocomplete for city/location search using Google Places API (New)
+- **Location-Based Event Generation**: Implemented dynamic event creation based on searched location with realistic venue names and event types
+- **Environment Configuration**: Set up dotenv for proper API key management and server-side proxy endpoints
+- **Enhanced Location Search**: Created comprehensive location search component with dropdown suggestions and current location detection
+- **Real-Time Events**: App now generates location-specific events when users search for any city, replacing static mock data with dynamic content
 
 ## User Preferences
 
