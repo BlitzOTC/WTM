@@ -264,7 +264,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">Start Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} data-testid="input-event-start-time" className="text-center [&::-webkit-datetime-edit]:text-center" />
+                      <Input type="time" {...field} data-testid="input-event-start-time" className="text-center [&::-webkit-datetime-edit]:text-center [&::-webkit-datetime-edit-fields-wrapper]:justify-center" style={{ textAlign: 'center' }} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -277,7 +277,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">End Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} data-testid="input-event-end-time" className="text-center [&::-webkit-datetime-edit]:text-center" />
+                      <Input type="time" {...field} data-testid="input-event-end-time" className="text-center [&::-webkit-datetime-edit]:text-center [&::-webkit-datetime-edit-fields-wrapper]:justify-center" style={{ textAlign: 'center' }} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
