@@ -135,7 +135,7 @@ export default function EventsHosted() {
                   <div className="flex items-center space-x-2 text-sm">
                     <DollarSign className="h-4 w-4 text-gray-500" />
                     <span className="text-gray-600" data-testid={`text-event-price-${event.id}`}>
-                      {event.price === 0 ? 'Free' : `$${event.price}`}
+                      {event.price === 0 ? 'Free' : event.price}
                     </span>
                   </div>
                   <div className="flex space-x-2">
