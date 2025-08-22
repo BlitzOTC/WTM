@@ -166,6 +166,7 @@ export default function CitiesExplored() {
                     variant="outline" 
                     size="sm" 
                     className="text-xs"
+                    onClick={() => setLocation(`/city-events?city=${city.id}`)}
                     data-testid={`button-view-city-events-${city.id}`}
                   >
                     View Events
