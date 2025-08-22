@@ -37,6 +37,11 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
 
   const formatCost = (cost: number) => {
     if (cost === 0) return "FREE";
+    return `$${(cost / 100).toFixed(0)}`;
+  };
+
+  const formatTotalCost = (cost: number) => {
+    if (cost === 0) return "FREE";
     return `${(cost / 100).toFixed(0)}`;
   };
 
@@ -169,7 +174,7 @@ export default function PlanSummaryModal({ isOpen, onClose, events }: PlanSummar
                   <div className="flex items-center space-x-2">
                     <DollarSign className="h-4 w-4 text-gray-500" />
                     <div>
-                      <div className="font-medium">{formatCost(variation.totalCost)}</div>
+                      <div className="font-medium">{formatTotalCost(variation.totalCost)}</div>
                       <div className="text-gray-500">Total cost</div>
                     </div>
                   </div>
