@@ -180,7 +180,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">Event Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Rooftop Jazz Night" {...field} data-testid="input-event-name" />
+                      <Input placeholder="e.g., Rooftop Jazz Night" {...field} data-testid="input-event-name" className="text-center" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -193,7 +193,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">Venue/Location</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., The Skyline Lounge" {...field} data-testid="input-event-venue" />
+                      <Input placeholder="e.g., The Skyline Lounge" {...field} data-testid="input-event-venue" className="text-center" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -221,7 +221,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">Address</FormLabel>
                     <FormControl>
-                      <Input placeholder="123 Main St" {...field} data-testid="input-event-address" />
+                      <Input placeholder="123 Main St" {...field} data-testid="input-event-address" className="text-center" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -234,7 +234,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">City</FormLabel>
                     <FormControl>
-                      <Input placeholder="San Francisco" {...field} data-testid="input-event-city" />
+                      <Input placeholder="San Francisco" {...field} data-testid="input-event-city" className="text-center" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -247,7 +247,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">State</FormLabel>
                     <FormControl>
-                      <Input placeholder="CA" {...field} data-testid="input-event-state" />
+                      <Input placeholder="CA" {...field} data-testid="input-event-state" className="text-center" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -264,7 +264,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">Start Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} data-testid="input-event-start-time" />
+                      <Input type="time" {...field} data-testid="input-event-start-time" className="text-center" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -277,7 +277,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                   <FormItem>
                     <FormLabel className="text-center block">End Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} data-testid="input-event-end-time" />
+                      <Input type="time" {...field} data-testid="input-event-end-time" className="text-center" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -453,6 +453,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
                         placeholder="Tell people what makes this event special..."
                         {...field}
                         data-testid="textarea-event-description"
+                        className="text-center"
                       />
                     </FormControl>
                     <FormMessage />
