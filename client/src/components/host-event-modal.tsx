@@ -207,7 +207,7 @@ export default function HostEventModal({ isOpen, onClose }: HostEventModalProps)
               <LocationSearch
                 value={locationInput}
                 onChange={handleLocationChange}
-                placeholder="Search for city, state..."
+                placeholder="Search any city worldwide..."
               />
               <p className="text-xs text-gray-500 mt-1">This will auto-fill the city and state fields below</p>
             </div>

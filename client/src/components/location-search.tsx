@@ -12,6 +12,7 @@ interface LocationSuggestion {
     city?: string;
     state?: string;
     country?: string;
+    country_code?: string;
   };
 }
 
@@ -21,7 +22,7 @@ interface LocationSearchProps {
   placeholder?: string;
 }
 
-export default function LocationSearch({ value, onChange, placeholder = "Enter city, state..." }: LocationSearchProps) {
+export default function LocationSearch({ value, onChange, placeholder = "Search any city worldwide..." }: LocationSearchProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,22 +57,23 @@ export default function LocationSearch({ value, onChange, placeholder = "Enter c
     try {
       // Using Nominatim (OpenStreetMap) geocoding service - free and no API key required
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(query)}&countrycodes=us&addressdetails=1`
+        `https://nominatim.openstreetmap.org/search?format=json&limit=8&q=${encodeURIComponent(query)}&addressdetails=1&accept-language=en`
       );
       
       if (response.ok) {
         const data = await response.json();
         const formattedSuggestions = data
-          .filter((item: any) => item.address && (item.address.city || item.address.town || item.address.village))
+          .filter((item: any) => item.address && (item.address.city || item.address.town || item.address.village || item.address.county))
           .map((item: any) => ({
             place_id: item.place_id,
             display_name: item.display_name,
             lat: item.lat,
             lon: item.lon,
             address: {
-              city: item.address.city || item.address.town || item.address.village,
-              state: item.address.state,
-              country: item.address.country
+              city: item.address.city || item.address.town || item.address.village || item.address.county,
+              state: item.address.state || item.address.province || item.address.region,
+              country: item.address.country,
+              country_code: item.address.country_code
             }
           }));
         setSuggestions(formattedSuggestions);
@@ -101,7 +103,13 @@ export default function LocationSearch({ value, onChange, placeholder = "Enter c
   };
 
   const handleSuggestionClick = (suggestion: LocationSuggestion) => {
-    const formattedLocation = `${suggestion.address.city}, ${suggestion.address.state}`;
+    let formattedLocation = suggestion.address.city || '';
+    if (suggestion.address.state) {
+      formattedLocation += `, ${suggestion.address.state}`;
+    }
+    if (suggestion.address.country && suggestion.address.country !== 'United States') {
+      formattedLocation += `, ${suggestion.address.country}`;
+    }
     setInputValue(formattedLocation);
     onChange(formattedLocation);
     setIsOpen(false);
@@ -175,7 +183,8 @@ export default function LocationSearch({ value, onChange, placeholder = "Enter c
                   <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-gray-900 truncate">
-                      {suggestion.address.city}, {suggestion.address.state}
+                      {suggestion.address.city}
+                      {suggestion.address.state && `, ${suggestion.address.state}`}
                     </div>
                     <div className="text-xs text-gray-500 truncate">
                       {suggestion.address.country}
