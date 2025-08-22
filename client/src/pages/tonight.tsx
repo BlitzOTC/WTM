@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { type Event } from "@shared/schema";
 import EventCard from "@/components/event-card";
 import FilterSidebar from "@/components/filter-sidebar";
+import FiltersModal from "@/components/filters-modal";
 import LocationSearch from "@/components/location-search";
 import { usePlan } from "@/hooks/use-plan";
 import { Calendar, MapPin, Filter, ChevronDown } from "lucide-react";
@@ -29,6 +30,7 @@ export default function Tonight() {
   });
   const [sortBy, setSortBy] = useState("time");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showFiltersModal, setShowFiltersModal] = useState(false);
 
   // Parse location for API call
   const [city, state] = searchQuery.split(',').map(s => s.trim());
@@ -169,12 +171,14 @@ export default function Tonight() {
               </div>
             </div>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={() => setShowMobileFilters(!showMobileFilters)}
-              data-testid="button-tonight-filters"
+              onClick={() => setShowFiltersModal(true)}
+              data-testid="button-filters"
+              className="flex items-center space-x-1"
             >
-              <Filter className="h-5 w-5" />
+              <Filter className="h-4 w-4" />
+              <span>Filters</span>
             </Button>
           </div>
           
@@ -252,6 +256,15 @@ export default function Tonight() {
           </div>
         )}
       </div>
+
+      {/* Filters Modal */}
+      <FiltersModal
+        isOpen={showFiltersModal}
+        onClose={() => setShowFiltersModal(false)}
+        filters={filters}
+        onFiltersChange={setFilters}
+        data-testid="modal-filters"
+      />
     </div>
   );
 }

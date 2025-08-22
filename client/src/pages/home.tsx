@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { type Event } from "@shared/schema";
 import FilterSidebar from "@/components/filter-sidebar";
+import FiltersModal from "@/components/filters-modal";
 import EventCard from "@/components/event-card";
 import NightPlan from "@/components/night-plan";
 import HostEventModal from "@/components/host-event-modal";
 import EventDetailModal from "@/components/event-detail-modal";
 import LocationSearch from "@/components/location-search";
 import { usePlan } from "@/hooks/use-plan";
-import { Menu, User, ChevronDown } from "lucide-react";
+import { Filter, User, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -35,6 +36,7 @@ export default function Home() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showFiltersModal, setShowFiltersModal] = useState(false);
 
   // Mock user preferences based on previous activity
   const userPreferences = {
@@ -189,13 +191,14 @@ export default function Home() {
 
             <div className="flex items-center space-x-4">
               <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setShowMobileFilters(!showMobileFilters)}
-                data-testid="button-mobile-filters"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFiltersModal(true)}
+                data-testid="button-filters"
+                className="flex items-center space-x-1"
               >
-                <Menu className="h-6 w-6" />
+                <Filter className="h-4 w-4" />
+                <span>Filters</span>
               </Button>
               
               <Button
@@ -321,6 +324,13 @@ export default function Home() {
         onAddToPlan={handleAddToPlan}
         isInPlan={selectedEvent ? selectedEvents.some(e => e.id === selectedEvent.id) : false}
         data-testid="modal-event-detail"
+      />
+      <FiltersModal
+        isOpen={showFiltersModal}
+        onClose={() => setShowFiltersModal(false)}
+        filters={filters}
+        onFiltersChange={setFilters}
+        data-testid="modal-filters"
       />
     </div>
   );
