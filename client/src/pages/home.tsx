@@ -101,7 +101,7 @@ export default function Home() {
     
     // Boost events with keywords from attended events
     userPreferences.attendedEvents.forEach(keyword => {
-      if (event.name.toLowerCase().includes(keyword) || event.description.toLowerCase().includes(keyword)) {
+      if (event.name.toLowerCase().includes(keyword) || (event.description && event.description.toLowerCase().includes(keyword))) {
         score += 1;
       }
     });
@@ -150,13 +150,14 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
+              {/* Desktop Dropdown Navigation */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2 p-2 hover:bg-gray-50" data-testid="dropdown-navigation-menu">
+                  <Button variant="ghost" className="hidden md:flex items-center space-x-2 p-2 hover:bg-gray-50" data-testid="dropdown-navigation-menu">
                     <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
                       <span className="text-white font-bold text-sm">T</span>
                     </div>
-                    <span className="text-xl font-bold text-gray-900">Tonight</span>
+                    <span className="text-xl font-bold text-gray-900">Search</span>
                     <ChevronDown className="h-4 w-4 text-gray-500" />
                   </Button>
                 </DropdownMenuTrigger>

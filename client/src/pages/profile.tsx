@@ -50,7 +50,7 @@ export default function Profile() {
                   <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-sm">T</span>
                   </div>
-                  <span className="text-xl font-bold text-gray-900">Tonight</span>
+                  <span className="text-xl font-bold text-gray-900">Profile</span>
                   <ChevronDown className="h-4 w-4 text-gray-500" />
                 </Button>
               </DropdownMenuTrigger>
