@@ -47,9 +47,9 @@ export default function Profile() {
   };
 
   const stats = [
-    { label: "Events Attended", value: "12", icon: Calendar },
-    { label: "Events Hosted", value: "3", icon: User },
-    { label: "Cities Explored", value: "5", icon: MapPin }
+    { label: "Events Attended", value: "12", icon: Calendar, route: "/events-attended" },
+    { label: "Events Hosted", value: "3", icon: User, route: "/events-hosted" },
+    { label: "Cities Explored", value: "5", icon: MapPin, route: "/cities-explored" }
   ];
 
   return (
@@ -192,11 +192,16 @@ export default function Profile() {
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
-                <div key={index} className="text-center">
+                <button 
+                  key={index} 
+                  className="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => setLocation(stat.route)}
+                  data-testid={`button-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}
+                >
                   <Icon className="h-6 w-6 text-primary mx-auto mb-2" />
                   <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
                   <div className="text-xs text-gray-600">{stat.label}</div>
-                </div>
+                </button>
               );
             })}
           </div>
