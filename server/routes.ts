@@ -11,15 +11,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { city, state, categories, ageRequirement, maxPrice, minPrice, eventType, location } = req.query;
       
-      // If Google API key is available and location is provided, fetch real events
-      const googleApiKey = process.env.GOOGLE_API_KEY;
-      if (googleApiKey && location) {
+      // Generate location-based events using the provided location
+      if (location) {
         try {
-          const googlePlaces = new GooglePlacesService(googleApiKey);
-          const realEvents = await googlePlaces.searchEvents(location as string);
+          console.log(`Generating events for location: ${location}`);
+          const locationBasedEvents = generateLocationBasedEvents(location as string);
           
-          // Apply filters to real events
-          let filteredEvents = realEvents;
+          // Apply filters to location-based events
+          let filteredEvents = locationBasedEvents;
           
           if (categories) {
             const categoryArray = typeof categories === 'string' ? [categories] : categories as string[];
@@ -44,10 +43,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             filteredEvents = filteredEvents.filter(event => event.price >= minPriceCents);
           }
           
+          console.log(`Returning ${filteredEvents.length} filtered events for ${location}`);
           return res.json(filteredEvents);
-        } catch (googleError) {
-          console.error("Google Places API error:", googleError);
-          // Fall back to storage events if Google API fails
+        } catch (error) {
+          console.error("Error generating location-based events:", error);
+          // Continue to fallback storage events below
         }
       }
       

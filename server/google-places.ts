@@ -39,20 +39,32 @@ export class GooglePlacesService {
     this.apiKey = apiKey;
   }
 
-  async searchEvents(location: string, radius: number = 5000): Promise<Event[]> {
+  async searchEvents(location: string, radius: number = 10000): Promise<Event[]> {
     try {
+      console.log(`Searching events for location: ${location}`);
+      
       // First, get coordinates for the location
       const coordinates = await this.geocodeLocation(location);
       if (!coordinates) {
-        throw new Error('Location not found');
+        console.error('Could not geocode location:', location);
+        // Return mock events as fallback instead of throwing error
+        return [];
       }
+
+      console.log(`Geocoded to: ${coordinates.lat}, ${coordinates.lng}`);
 
       // Search for event venues and entertainment places
       const venues = await this.searchVenues(coordinates.lat, coordinates.lng, radius);
       
+      if (venues.length === 0) {
+        console.log('No venues found, returning empty array');
+        return [];
+      }
+      
       // Convert venues to events with realistic data
       const events = this.convertVenuesToEvents(venues, location);
       
+      console.log(`Generated ${events.length} events from venues`);
       return events;
     } catch (error) {
       console.error('Error fetching events from Google Places:', error);
@@ -62,11 +74,12 @@ export class GooglePlacesService {
 
   private async geocodeLocation(location: string): Promise<{ lat: number; lng: number } | null> {
     try {
+      // Use the new Geocoding API
       const response = await fetch(
-        `${this.baseUrl}/textsearch/json?query=${encodeURIComponent(location)}&key=${this.apiKey}`
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${this.apiKey}`
       );
       
-      const data: GooglePlacesResponse = await response.json();
+      const data = await response.json();
       
       if (data.status === 'OK' && data.results.length > 0) {
         const place = data.results[0];
@@ -76,6 +89,7 @@ export class GooglePlacesService {
         };
       }
       
+      console.error('Geocoding failed:', data.status, data.error_message);
       return null;
     } catch (error) {
       console.error('Geocoding error:', error);
@@ -99,17 +113,19 @@ export class GooglePlacesService {
 
     const allVenues: GooglePlace[] = [];
 
-    // Search for different types of venues
-    for (const type of venueTypes.slice(0, 3)) { // Limit to avoid quota issues
+    // Search for different types of venues using Places API
+    for (const type of venueTypes.slice(0, 4)) { // Get a few different types
       try {
         const response = await fetch(
-          `${this.baseUrl}/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${type}&key=${this.apiKey}`
+          `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${type}&key=${this.apiKey}`
         );
         
         const data: GooglePlacesResponse = await response.json();
         
         if (data.status === 'OK') {
           allVenues.push(...data.results);
+        } else {
+          console.log(`Search for ${type} returned:`, data.status);
         }
       } catch (error) {
         console.error(`Error searching for ${type}:`, error);
@@ -121,7 +137,8 @@ export class GooglePlacesService {
       index === self.findIndex(v => v.place_id === venue.place_id)
     );
 
-    return uniqueVenues.slice(0, 20); // Limit to 20 venues
+    console.log(`Found ${uniqueVenues.length} unique venues`);
+    return uniqueVenues.slice(0, 15); // Limit to 15 venues
   }
 
   private convertVenuesToEvents(venues: GooglePlace[], city: string): Event[] {
