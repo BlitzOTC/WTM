@@ -191,43 +191,13 @@ export class GooglePlacesService {
       
       const timeString = `${eventStart.getHours().toString().padStart(2, '0')}:${eventStart.getMinutes().toString().padStart(2, '0')}`;
       
-      // Determine event type based on venue type
-      let categories: string[] = [];
-      let eventName = venue.name;
-      
-      if (venue.types.includes('night_club') || venue.types.includes('bar')) {
-        categories = ['drinks', 'music', 'dancing'];
-        eventName = `Live Music at ${venue.name}`;
-      } else if (venue.types.includes('restaurant')) {
-        categories = ['food', 'drinks'];
-        eventName = `Dinner Experience at ${venue.name}`;
-      } else if (venue.types.includes('movie_theater')) {
-        categories = ['entertainment'];
-        eventName = `Movie Night at ${venue.name}`;
-      } else if (venue.types.includes('museum') || venue.types.includes('art_gallery')) {
-        categories = ['entertainment'];
-        eventName = `Evening Exhibition at ${venue.name}`;
-      } else {
-        categories = [eventCategories[Math.floor(Math.random() * eventCategories.length)]];
-        eventName = `Event at ${venue.name}`;
-      }
+      // Generate specific event details based on venue type
+      const eventData = this.generateEventDetails(venue.types, venue.name);
+      const categories = eventData.categories;
+      const eventName = eventData.name;
 
-      // Generate realistic pricing based on venue type and rating
-      let price = 0;
-      if (venue.price_level) {
-        switch (venue.price_level) {
-          case 1: price = Math.floor(Math.random() * 2000) + 500; break; // $5-25
-          case 2: price = Math.floor(Math.random() * 3000) + 1500; break; // $15-45
-          case 3: price = Math.floor(Math.random() * 4000) + 2500; break; // $25-65
-          case 4: price = Math.floor(Math.random() * 6000) + 4000; break; // $40-100
-          default: price = Math.floor(Math.random() * 2000); // $0-20
-        }
-      } else {
-        price = Math.floor(Math.random() * 3000); // Random price if no price level
-      }
-
-      // Some events should be free
-      if (Math.random() < 0.2) price = 0;
+      // Generate realistic pricing based on venue type
+      const price = this.generateVenuePrice(venue.types, venue.price_level);
 
       // Get venue photo URL using Places API (New) format
       let imageUrl = `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 100000000)}?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=240`;
@@ -241,21 +211,174 @@ export class GooglePlacesService {
       return {
         id: venue.place_id,
         name: eventName,
-        description: `Join us for an amazing ${categories.join(', ')} experience at ${venue.name}. ${venue.vicinity || venue.formatted_address || ''}`,
+        description: this.generateEventDescription(venue.types, venue.name, eventData),
         venue: venue.name,
         address: venue.vicinity || venue.formatted_address || '',
         city: city,
         startTime: timeString,
         price: price,
         categories: categories,
-        ageRequirement: ageRequirements[Math.floor(Math.random() * ageRequirements.length)],
+        ageRequirement: eventData.ageRequirement,
         capacity: Math.floor(Math.random() * 200) + 50,
         attendees: Math.floor(Math.random() * 150) + 10,
         imageUrl: imageUrl,
         ticketLinks: {},
-        rating: venue.rating || Math.floor(Math.random() * 20) + 35 / 10 // Convert to 3.5-5.0 scale
+        rating: venue.rating || Math.floor(Math.random() * 15) + 35 / 10 // Convert to 3.5-5.0 scale
       } as Event;
     });
+  }
+
+  private generateEventDetails(venueTypes: string[], venueName: string) {
+    const musicEvents = [
+      'Live Jazz Night', 'Acoustic Session', 'DJ Set', 'Open Mic Night', 'Live Band Performance',
+      'Karaoke Night', 'Blues Jam Session', 'Rock Concert', 'Electronic Music Night', 'Indie Music Showcase'
+    ];
+    
+    const restaurantEvents = [
+      'Wine Pairing Dinner', 'Chef\'s Tasting Menu', 'Date Night Special', 'Happy Hour',
+      'Brunch Experience', 'Cocktail Class', 'Food & Wine Festival', 'Live Cooking Demo',
+      'Seasonal Menu Launch', 'Chef\'s Table Experience'
+    ];
+    
+    const comedyEvents = [
+      'Stand-Up Comedy Show', 'Comedy Open Mic', 'Improv Night', 'Comedy Showcase',
+      'Late Night Comedy', 'Comedy Special Taping', 'Roast Battle', 'Comedy Competition'
+    ];
+    
+    const artEvents = [
+      'Art Gallery Opening', 'Artist Meet & Greet', 'Photography Exhibition', 'Sculpture Display',
+      'Contemporary Art Show', 'Local Artist Showcase', 'Art Walk', 'Creative Workshop'
+    ];
+    
+    const theaterEvents = [
+      'Live Theater Performance', 'Musical Theater', 'Drama Production', 'Comedy Play',
+      'One-Man Show', 'Shakespeare Performance', 'Original Production', 'Theater Workshop'
+    ];
+    
+    if (venueTypes.includes('restaurant') || venueTypes.includes('meal_takeaway') || venueTypes.includes('food')) {
+      return {
+        name: restaurantEvents[Math.floor(Math.random() * restaurantEvents.length)],
+        categories: ['food', 'drinks'],
+        ageRequirement: 'all'
+      };
+    } else if (venueTypes.includes('night_club') || venueTypes.includes('bar')) {
+      return {
+        name: musicEvents[Math.floor(Math.random() * musicEvents.length)],
+        categories: ['drinks', 'music', 'dancing'],
+        ageRequirement: '21'
+      };
+    } else if (venueTypes.includes('movie_theater')) {
+      const movieTitles = [
+        'Indie Film Festival', 'Classic Movie Night', 'Documentary Screening', 'Foreign Film Night',
+        'Horror Movie Marathon', 'Comedy Film Night', 'Art House Cinema', 'Director\'s Cut Screening'
+      ];
+      return {
+        name: movieTitles[Math.floor(Math.random() * movieTitles.length)],
+        categories: ['entertainment'],
+        ageRequirement: 'all'
+      };
+    } else if (venueTypes.includes('museum') || venueTypes.includes('art_gallery')) {
+      return {
+        name: artEvents[Math.floor(Math.random() * artEvents.length)],
+        categories: ['entertainment'],
+        ageRequirement: 'all'
+      };
+    } else if (venueTypes.includes('bowling_alley')) {
+      return {
+        name: 'Bowling Tournament',
+        categories: ['entertainment', 'sports'],
+        ageRequirement: 'all'
+      };
+    } else if (venueTypes.includes('amusement_park')) {
+      return {
+        name: 'Evening Park Experience',
+        categories: ['entertainment'],
+        ageRequirement: 'all'
+      };
+    } else {
+      // Default to entertainment venue
+      return {
+        name: theaterEvents[Math.floor(Math.random() * theaterEvents.length)],
+        categories: ['entertainment'],
+        ageRequirement: '18'
+      };
+    }
+  }
+
+  private generateVenuePrice(venueTypes: string[], priceLevel?: number): number {
+    // Restaurants have no cover charge (price = 0), people spend money on food/drinks inside
+    if (venueTypes.includes('restaurant') || venueTypes.includes('meal_takeaway') || venueTypes.includes('food')) {
+      return 0; // No cover charge for restaurants
+    }
+    
+    // Museums and galleries typically have admission fees
+    if (venueTypes.includes('museum') || venueTypes.includes('art_gallery')) {
+      return Math.floor(Math.random() * 2000) + 1000; // $10-30 admission
+    }
+    
+    // Movie theaters have ticket prices
+    if (venueTypes.includes('movie_theater')) {
+      return Math.floor(Math.random() * 1500) + 1200; // $12-27 tickets
+    }
+    
+    // Bowling alleys and entertainment venues
+    if (venueTypes.includes('bowling_alley') || venueTypes.includes('amusement_park')) {
+      return Math.floor(Math.random() * 2500) + 1500; // $15-40
+    }
+    
+    // Bars and nightclubs - cover charges based on price level
+    if (venueTypes.includes('night_club') || venueTypes.includes('bar')) {
+      if (priceLevel) {
+        switch (priceLevel) {
+          case 1: return Math.floor(Math.random() * 1000) + 500; // $5-15
+          case 2: return Math.floor(Math.random() * 1500) + 1000; // $10-25
+          case 3: return Math.floor(Math.random() * 2000) + 1500; // $15-35
+          case 4: return Math.floor(Math.random() * 3000) + 2000; // $20-50
+        }
+      }
+      
+      // Random cover charge for bars/clubs without price level
+      const isFree = Math.random() < 0.3; // 30% chance of no cover
+      return isFree ? 0 : Math.floor(Math.random() * 2000) + 500; // $0 or $5-25
+    }
+    
+    // Default pricing for other venue types
+    const isFree = Math.random() < 0.2; // 20% chance of free events
+    return isFree ? 0 : Math.floor(Math.random() * 2500) + 1000; // $0 or $10-35
+  }
+
+  private generateEventDescription(venueTypes: string[], venueName: string, eventData: any): string {
+    if (venueTypes.includes('restaurant') || venueTypes.includes('meal_takeaway') || venueTypes.includes('food')) {
+      const menuItems = [
+        'Fresh seafood dishes with locally sourced ingredients',
+        'Artisanal pizzas and craft cocktails',
+        'Farm-to-table cuisine with seasonal menu',
+        'Mediterranean specialties and fine wines',
+        'Gourmet burgers and craft beer selection',
+        'Italian pasta dishes and authentic desserts',
+        'Sushi and Japanese cuisine experience',
+        'Steakhouse classics with premium cuts',
+        'Vegan and vegetarian specialties',
+        'Fusion cuisine with innovative flavors'
+      ];
+      
+      const menuDescription = menuItems[Math.floor(Math.random() * menuItems.length)];
+      return `Experience exceptional dining at ${venueName}. Tonight's menu features ${menuDescription}. Reservations recommended for the best seating. No cover charge - you'll love our carefully crafted dishes and beverage selection.`;
+    }
+    
+    if (venueTypes.includes('night_club') || venueTypes.includes('bar')) {
+      return `Join us tonight at ${venueName} for an unforgettable night of music and dancing. Premium drink specials, live DJ sets, and an electric atmosphere. Perfect for a night out with friends!`;
+    }
+    
+    if (venueTypes.includes('movie_theater')) {
+      return `Catch tonight's featured screening at ${venueName}. Comfortable seating, premium sound system, and concessions available. A perfect evening entertainment experience.`;
+    }
+    
+    if (venueTypes.includes('museum') || venueTypes.includes('art_gallery')) {
+      return `Discover inspiring art and culture at ${venueName}. Tonight's exhibition features captivating works that celebrate creativity and artistic expression. Educational and entertaining for all ages.`;
+    }
+    
+    return `Join us tonight at ${venueName} for ${eventData.name}. An exciting evening of entertainment that you won't want to miss!`;
   }
 }
 
