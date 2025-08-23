@@ -1,7 +1,8 @@
 import { type Event } from "@shared/schema";
-import { Clock, MapPin } from "lucide-react";
+import { Clock, MapPin, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "wouter";
 
 interface EventCardProps {
   event: Event;
@@ -43,6 +44,15 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
   };
 
   const categories = Array.isArray(event.categories) ? event.categories : [];
+  
+  // Determine if this is a restaurant/bar without an event
+  const isRestaurantVenue = categories.includes('food') && event.name === event.venue;
+  const isBarVenue = (categories.includes('drinks') || categories.includes('dancing')) && event.name === event.venue;
+  const isVenueOnly = isRestaurantVenue || isBarVenue;
+  
+  // Determine display structure
+  const mainTitle = event.name;
+  const subTitle = event.name === event.venue ? null : event.venue;
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow relative">
@@ -57,11 +67,13 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
         <div className="flex items-start justify-between mb-3">
           <div>
             <h3 className="font-semibold text-gray-900 mb-1" data-testid={`text-event-name-${event.id}`}>
-              {event.name}
+              {mainTitle}
             </h3>
-            <p className="text-sm text-gray-600" data-testid={`text-event-venue-${event.id}`}>
-              {event.venue}
-            </p>
+            {subTitle && (
+              <p className="text-sm text-gray-600" data-testid={`text-event-venue-${event.id}`}>
+                {subTitle}
+              </p>
+            )}
           </div>
           <div className="text-right">
             <p className={`text-lg font-bold ${event.price === 0 ? 'text-green-600' : 'text-primary'}`} data-testid={`text-event-price-${event.id}`}>
@@ -106,6 +118,19 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
       {/* Fixed positioned buttons at bottom */}
       <div className="absolute bottom-0 left-0 right-0 p-5 bg-white">
         <div className="flex space-x-2">
+          {isRestaurantVenue && (
+            <Link to={`/menu/${event.id}`}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+                data-testid={`button-menu-${event.id}`}
+              >
+                <Menu className="h-4 w-4" />
+                Menu
+              </Button>
+            </Link>
+          )}
           <Button
             onClick={() => onAddToPlan(event)}
             disabled={isInPlan}

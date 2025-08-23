@@ -16,6 +16,7 @@ import CitiesExplored from "@/pages/cities-explored";
 import CityEvents from "@/pages/city-events";
 import Navigation from "@/pages/navigation";
 import NotFound from "@/pages/not-found";
+import MenuPage from "@/pages/menu";
 import MobileBottomNav from "@/components/mobile-bottom-nav";
 
 function Router() {
@@ -45,6 +46,7 @@ function Router() {
         <Route path="/cities-explored" component={CitiesExplored} />
         <Route path="/city-events" component={CityEvents} />
         <Route path="/navigation" component={Navigation} />
+        <Route path="/menu/:venueId" component={MenuPage} />
         <Route component={NotFound} />
       </Switch>
       

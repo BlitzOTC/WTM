@@ -92,7 +92,62 @@ function getStreetType(): string {
   return types[Math.floor(Math.random() * types.length)];
 }
 
+function generateSampleMenu(venueId: string) {
+  const restaurantNames = [
+    'The Cheesecake Factory', 'Olive Garden', 'Applebee\'s', 'TGI Friday\'s',
+    'Red Lobster', 'Outback Steakhouse', 'Buffalo Wild Wings', 'Chili\'s'
+  ];
+
+  const venueName = restaurantNames[Math.floor(Math.random() * restaurantNames.length)];
+  
+  const appetizers = [
+    { id: '1', name: 'Loaded Nachos', description: 'Crispy tortilla chips with cheese, jalapeños, and sour cream', price: 1299, category: 'Appetizers' },
+    { id: '2', name: 'Buffalo Wings', description: 'Classic buffalo wings with celery and ranch dipping sauce', price: 1499, category: 'Appetizers' },
+    { id: '3', name: 'Spinach Artichoke Dip', description: 'Warm creamy dip served with tortilla chips', price: 1199, category: 'Appetizers' }
+  ];
+
+  const mains = [
+    { id: '4', name: 'Grilled Salmon', description: 'Fresh Atlantic salmon with lemon herb butter and vegetables', price: 2899, category: 'Main Courses' },
+    { id: '5', name: 'BBQ Ribs', description: 'Slow-cooked baby back ribs with house BBQ sauce', price: 2699, category: 'Main Courses' },
+    { id: '6', name: 'Chicken Alfredo', description: 'Grilled chicken breast over fettuccine in creamy alfredo sauce', price: 2399, category: 'Main Courses' },
+    { id: '7', name: 'Classic Burger', description: 'Angus beef patty with lettuce, tomato, onion, and fries', price: 1899, category: 'Main Courses' }
+  ];
+
+  const drinks = [
+    { id: '8', name: 'Craft Beer Selection', description: 'Local craft beers on tap', price: 699, category: 'Beverages' },
+    { id: '9', name: 'House Wine', description: 'Red or white wine by the glass', price: 899, category: 'Beverages' },
+    { id: '10', name: 'Signature Cocktails', description: 'Bartender\'s special cocktail creations', price: 1299, category: 'Beverages' }
+  ];
+
+  const desserts = [
+    { id: '11', name: 'Chocolate Cake', description: 'Rich chocolate layer cake with vanilla ice cream', price: 899, category: 'Desserts' },
+    { id: '12', name: 'Cheesecake', description: 'New York style cheesecake with berry compote', price: 799, category: 'Desserts' }
+  ];
+
+  return {
+    venueName: venueName,
+    venueType: 'Restaurant',
+    address: '123 Main Street, Downtown',
+    menuItems: [...appetizers, ...mains, ...drinks, ...desserts]
+  };
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Get menu for a specific venue
+  app.get('/api/menu/:venueId', async (req, res) => {
+    try {
+      const { venueId } = req.params;
+      console.log(`Fetching menu for venue: ${venueId}`);
+
+      // Generate sample menu data based on venue
+      const menuData = generateSampleMenu(venueId);
+      res.json(menuData);
+    } catch (error) {
+      console.error('Error fetching menu:', error);
+      res.status(500).json({ error: 'Failed to fetch menu' });
+    }
+  });
+
   // Event routes
   app.get("/api/events", async (req, res) => {
     try {
