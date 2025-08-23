@@ -1,4 +1,5 @@
 import { type Event } from "../shared/schema";
+import { RealEventAggregator, TicketmasterAPI, EventbriteAPI } from "./event-apis";
 
 interface GooglePlace {
   place_id: string;
@@ -41,35 +42,68 @@ export class GooglePlacesService {
 
   async searchEvents(location: string, radius: number = 10000): Promise<Event[]> {
     try {
-      console.log(`Searching events for location: ${location}`);
+      console.log(`Searching for real events in location: ${location}`);
       
       // First, get coordinates for the location
       const coordinates = await this.geocodeLocation(location);
       if (!coordinates) {
         console.error('Could not geocode location:', location);
-        // Return mock events as fallback instead of throwing error
         return [];
       }
 
       console.log(`Geocoded to: ${coordinates.lat}, ${coordinates.lng}`);
 
-      // Search for event venues and entertainment places
+      // Try to get real events from APIs first
+      const realEvents = await this.fetchRealEvents(location, coordinates.lat, coordinates.lng);
+      
+      if (realEvents.length > 0) {
+        console.log(`Found ${realEvents.length} real events`);
+        return realEvents;
+      }
+      
+      // If no real events, show venue listings only
+      console.log('No real events found, showing venue listings');
       const venues = await this.searchVenues(coordinates.lat, coordinates.lng, radius);
       
       if (venues.length === 0) {
-        console.log('No venues found, returning empty array');
+        console.log('No venues found');
         return [];
       }
       
-      // Convert venues to events with realistic data
-      const events = this.convertVenuesToEvents(venues, location);
+      // Convert venues to simple venue listings
+      const venueListings = this.convertVenuesToListings(venues, location);
       
-      console.log(`Generated ${events.length} events from venues`);
-      return events;
+      console.log(`Found ${venueListings.length} venue listings`);
+      return venueListings;
     } catch (error) {
-      console.error('Error fetching events from Google Places:', error);
+      console.error('Error fetching events:', error);
       throw error;
     }
+  }
+
+  private async fetchRealEvents(location: string, lat: number, lng: number): Promise<Event[]> {
+    const eventAggregator = new RealEventAggregator();
+    
+    // Add event APIs if API keys are available
+    const ticketmasterKey = process.env.TICKETMASTER_API_KEY;
+    const eventbriteKey = process.env.EVENTBRITE_API_KEY;
+    
+    if (ticketmasterKey) {
+      console.log('Using Ticketmaster API for real events');
+      eventAggregator.addAPI(new TicketmasterAPI(ticketmasterKey));
+    }
+    
+    if (eventbriteKey) {
+      console.log('Using Eventbrite API for real events');
+      eventAggregator.addAPI(new EventbriteAPI(eventbriteKey));
+    }
+    
+    if (!ticketmasterKey && !eventbriteKey) {
+      console.log('No event API keys available - cannot fetch real events');
+      return [];
+    }
+    
+    return await eventAggregator.searchAllEvents(location, lat, lng);
   }
 
   private async geocodeLocation(location: string): Promise<{ lat: number; lng: number } | null> {
@@ -179,7 +213,7 @@ export class GooglePlacesService {
     return allVenues.slice(0, 15);
   }
 
-  private convertVenuesToEvents(venues: GooglePlace[], city: string): Event[] {
+  private convertVenuesToListings(venues: GooglePlace[], city: string): Event[] {
     const eventCategories = ['music', 'food', 'drinks', 'dancing', 'entertainment', 'sports'];
     const ageRequirements = ['18', '21', 'all'];
     
@@ -191,10 +225,10 @@ export class GooglePlacesService {
       
       const timeString = `${eventStart.getHours().toString().padStart(2, '0')}:${eventStart.getMinutes().toString().padStart(2, '0')}`;
       
-      // Generate specific event details based on venue type
-      const eventData = this.generateEventDetails(venue.types, venue.name);
-      const categories = eventData.categories;
-      const eventName = eventData.name;
+      // Generate venue listing details based on venue type
+      const venueData = this.generateVenueListingDetails(venue.types, venue.name);
+      const categories = venueData.categories;
+      const listingName = venueData.name;
 
       // Generate realistic pricing based on venue type
       const price = this.generateVenuePrice(venue.types, venue.price_level);
@@ -210,25 +244,25 @@ export class GooglePlacesService {
 
       return {
         id: venue.place_id,
-        name: eventName,
-        description: this.generateEventDescription(venue.types, venue.name, eventData),
+        name: listingName,
+        description: this.generateVenueDescription(venue.types, venue.name),
         venue: venue.name,
         address: venue.vicinity || venue.formatted_address || '',
         city: city,
         startTime: timeString,
         price: price,
         categories: categories,
-        ageRequirement: eventData.ageRequirement,
+        ageRequirement: venueData.ageRequirement,
         capacity: Math.floor(Math.random() * 200) + 50,
         attendees: Math.floor(Math.random() * 150) + 10,
         imageUrl: imageUrl,
         ticketLinks: {},
-        rating: venue.rating || Math.floor(Math.random() * 15) + 35 / 10 // Convert to 3.5-5.0 scale
+        rating: venue.rating || Math.floor(Math.random() * 15) + 35 / 10
       } as Event;
     });
   }
 
-  private generateEventDetails(venueTypes: string[], venueName: string) {
+  private generateVenueListingDetails(venueTypes: string[], venueName: string) {
     const musicEvents = [
       'Live Jazz Night', 'Acoustic Session', 'DJ Set', 'Open Mic Night', 'Live Band Performance',
       'Karaoke Night', 'Blues Jam Session', 'Rock Concert', 'Electronic Music Night', 'Indie Music Showcase'
@@ -255,50 +289,34 @@ export class GooglePlacesService {
       'One-Man Show', 'Shakespeare Performance', 'Original Production', 'Theater Workshop'
     ];
     
+    // For venue listings, use the venue name directly
     if (venueTypes.includes('restaurant') || venueTypes.includes('meal_takeaway') || venueTypes.includes('food')) {
       return {
-        name: restaurantEvents[Math.floor(Math.random() * restaurantEvents.length)],
+        name: venueName, // Restaurant name as main title
         categories: ['food', 'drinks'],
         ageRequirement: 'all'
       };
     } else if (venueTypes.includes('night_club') || venueTypes.includes('bar')) {
       return {
-        name: musicEvents[Math.floor(Math.random() * musicEvents.length)],
+        name: venueName, // Bar name as main title
         categories: ['drinks', 'music', 'dancing'],
         ageRequirement: '21'
       };
     } else if (venueTypes.includes('movie_theater')) {
-      const movieTitles = [
-        'Indie Film Festival', 'Classic Movie Night', 'Documentary Screening', 'Foreign Film Night',
-        'Horror Movie Marathon', 'Comedy Film Night', 'Art House Cinema', 'Director\'s Cut Screening'
-      ];
       return {
-        name: movieTitles[Math.floor(Math.random() * movieTitles.length)],
+        name: venueName, // Theater name as main title
         categories: ['entertainment'],
         ageRequirement: 'all'
       };
     } else if (venueTypes.includes('museum') || venueTypes.includes('art_gallery')) {
       return {
-        name: artEvents[Math.floor(Math.random() * artEvents.length)],
-        categories: ['entertainment'],
-        ageRequirement: 'all'
-      };
-    } else if (venueTypes.includes('bowling_alley')) {
-      return {
-        name: 'Bowling Tournament',
-        categories: ['entertainment', 'sports'],
-        ageRequirement: 'all'
-      };
-    } else if (venueTypes.includes('amusement_park')) {
-      return {
-        name: 'Evening Park Experience',
+        name: venueName, // Museum/Gallery name as main title
         categories: ['entertainment'],
         ageRequirement: 'all'
       };
     } else {
-      // Default to entertainment venue
       return {
-        name: theaterEvents[Math.floor(Math.random() * theaterEvents.length)],
+        name: venueName, // Venue name as main title
         categories: ['entertainment'],
         ageRequirement: '18'
       };
@@ -347,38 +365,24 @@ export class GooglePlacesService {
     return isFree ? 0 : Math.floor(Math.random() * 2500) + 1000; // $0 or $10-35
   }
 
-  private generateEventDescription(venueTypes: string[], venueName: string, eventData: any): string {
+  private generateVenueDescription(venueTypes: string[], venueName: string): string {
     if (venueTypes.includes('restaurant') || venueTypes.includes('meal_takeaway') || venueTypes.includes('food')) {
-      const menuItems = [
-        'Fresh seafood dishes with locally sourced ingredients',
-        'Artisanal pizzas and craft cocktails',
-        'Farm-to-table cuisine with seasonal menu',
-        'Mediterranean specialties and fine wines',
-        'Gourmet burgers and craft beer selection',
-        'Italian pasta dishes and authentic desserts',
-        'Sushi and Japanese cuisine experience',
-        'Steakhouse classics with premium cuts',
-        'Vegan and vegetarian specialties',
-        'Fusion cuisine with innovative flavors'
-      ];
-      
-      const menuDescription = menuItems[Math.floor(Math.random() * menuItems.length)];
-      return `Experience exceptional dining at ${venueName}. Tonight's menu features ${menuDescription}. Reservations recommended for the best seating. No cover charge - you'll love our carefully crafted dishes and beverage selection.`;
+      return `Popular dining destination offering quality cuisine and atmosphere. Check our menu for current offerings and specialties.`;
     }
     
     if (venueTypes.includes('night_club') || venueTypes.includes('bar')) {
-      return `Join us tonight at ${venueName} for an unforgettable night of music and dancing. Premium drink specials, live DJ sets, and an electric atmosphere. Perfect for a night out with friends!`;
+      return `Popular nightlife venue with drinks, music, and entertainment. Check current events and hours.`;
     }
     
     if (venueTypes.includes('movie_theater')) {
-      return `Catch tonight's featured screening at ${venueName}. Comfortable seating, premium sound system, and concessions available. A perfect evening entertainment experience.`;
+      return `Movie theater showing current films. Check showtimes and ticket availability.`;
     }
     
     if (venueTypes.includes('museum') || venueTypes.includes('art_gallery')) {
-      return `Discover inspiring art and culture at ${venueName}. Tonight's exhibition features captivating works that celebrate creativity and artistic expression. Educational and entertaining for all ages.`;
+      return `Cultural venue featuring exhibitions and educational programs. Check current exhibits and visiting hours.`;
     }
     
-    return `Join us tonight at ${venueName} for ${eventData.name}. An exciting evening of entertainment that you won't want to miss!`;
+    return `Popular local venue. Check current events and operating hours.`;
   }
 }
 
