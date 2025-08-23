@@ -98,47 +98,85 @@ export class GooglePlacesService {
   }
 
   private async searchVenues(lat: number, lng: number, radius: number): Promise<GooglePlace[]> {
-    const venueTypes = [
-      'night_club',
-      'bar',
-      'restaurant', 
-      'movie_theater',
-      'bowling_alley',
-      'amusement_park',
-      'museum',
-      'art_gallery',
-      'concert_hall',
-      'stadium'
-    ];
-
     const allVenues: GooglePlace[] = [];
 
-    // Search for different types of venues using Places API
-    for (const type of venueTypes.slice(0, 4)) { // Get a few different types
-      try {
-        const response = await fetch(
-          `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${type}&key=${this.apiKey}`
-        );
-        
-        const data: GooglePlacesResponse = await response.json();
-        
-        if (data.status === 'OK') {
-          allVenues.push(...data.results);
-        } else {
-          console.log(`Search for ${type} returned:`, data.status);
+    try {
+      // Use Places API (New) for venue searches
+      const response = await fetch(
+        'https://places.googleapis.com/v1/places:searchNearby',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': this.apiKey,
+            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.rating,places.priceLevel,places.photos,places.types,places.id,places.currentOpeningHours,places.businessStatus'
+          },
+          body: JSON.stringify({
+            includedTypes: [
+              'night_club',
+              'bar', 
+              'restaurant',
+              'movie_theater',
+              'bowling_alley',
+              'amusement_park',
+              'museum',
+              'art_gallery',
+              'performing_arts_theater',
+              'stadium'
+            ],
+            maxResultCount: 20,
+            locationRestriction: {
+              circle: {
+                center: {
+                  latitude: lat,
+                  longitude: lng
+                },
+                radius: radius
+              }
+            }
+          })
         }
-      } catch (error) {
-        console.error(`Error searching for ${type}:`, error);
+      );
+
+      const data = await response.json();
+      
+      if (response.ok && data.places) {
+        // Convert new API format to old format for compatibility
+        const convertedVenues = data.places.map((place: any) => ({
+          place_id: place.id,
+          name: place.displayName?.text || 'Unknown Venue',
+          vicinity: place.formattedAddress,
+          formatted_address: place.formattedAddress,
+          rating: place.rating,
+          price_level: place.priceLevel,
+          opening_hours: place.currentOpeningHours ? {
+            open_now: place.businessStatus === 'OPERATIONAL'
+          } : undefined,
+          photos: place.photos?.map((photo: any) => ({
+            photo_reference: photo.name,
+            height: photo.heightPx || 400,
+            width: photo.widthPx || 400
+          })) || [],
+          types: place.types || [],
+          geometry: {
+            location: {
+              lat: place.location?.latitude || lat,
+              lng: place.location?.longitude || lng
+            }
+          }
+        }));
+        
+        allVenues.push(...convertedVenues);
+        console.log(`Found ${convertedVenues.length} venues using Places API (New)`);
+      } else {
+        console.error('Places API (New) error:', data.error?.message || 'Unknown error');
       }
+    } catch (error) {
+      console.error('Error with Places API (New):', error);
     }
 
-    // Remove duplicates and limit results
-    const uniqueVenues = allVenues.filter((venue, index, self) => 
-      index === self.findIndex(v => v.place_id === venue.place_id)
-    );
-
-    console.log(`Found ${uniqueVenues.length} unique venues`);
-    return uniqueVenues.slice(0, 15); // Limit to 15 venues
+    console.log(`Total unique venues found: ${allVenues.length}`);
+    return allVenues.slice(0, 15);
   }
 
   private convertVenuesToEvents(venues: GooglePlace[], city: string): Event[] {
@@ -191,6 +229,15 @@ export class GooglePlacesService {
       // Some events should be free
       if (Math.random() < 0.2) price = 0;
 
+      // Get venue photo URL using Places API (New) format
+      let imageUrl = `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 100000000)}?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=240`;
+      
+      if (venue.photos?.length) {
+        // Use Places API (New) photo format
+        const photoName = venue.photos[0].photo_reference;
+        imageUrl = `https://places.googleapis.com/v1/${photoName}/media?maxHeightPx=400&maxWidthPx=400&key=${this.apiKey}`;
+      }
+
       return {
         id: venue.place_id,
         name: eventName,
@@ -204,9 +251,7 @@ export class GooglePlacesService {
         ageRequirement: ageRequirements[Math.floor(Math.random() * ageRequirements.length)],
         capacity: Math.floor(Math.random() * 200) + 50,
         attendees: Math.floor(Math.random() * 150) + 10,
-        imageUrl: venue.photos?.length ? 
-          `${this.baseUrl}/photo?maxwidth=400&photo_reference=${venue.photos[0].photo_reference}&key=${this.apiKey}` :
-          `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 100000000)}?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=240`,
+        imageUrl: imageUrl,
         ticketLinks: {},
         rating: venue.rating || Math.floor(Math.random() * 20) + 35 / 10 // Convert to 3.5-5.0 scale
       } as Event;

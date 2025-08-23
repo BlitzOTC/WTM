@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertEventSchema, insertNightPlanSchema, type Event } from "@shared/schema";
 import { z } from "zod";
 import GooglePlacesService from "./google-places";
+import { EnhancedVenueEventGenerator } from "./real-events";
 
 // Generate location-specific events based on the search location
 function generateLocationBasedEvents(location: string): Event[] {
@@ -105,8 +106,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const googlePlaces = new GooglePlacesService(googleApiKey);
           const realEvents = await googlePlaces.searchEvents(location as string);
           
-          // If no real events found, generate location-based events as fallback
-          const locationBasedEvents = realEvents.length > 0 ? realEvents : generateLocationBasedEvents(location as string);
+          // Use enhanced venue-based events with real venue names
+          const locationBasedEvents = realEvents.length > 0 ? realEvents : 
+            EnhancedVenueEventGenerator.generateRealEvents(location as string);
           
           // Apply filters to events
           let filteredEvents = locationBasedEvents;
