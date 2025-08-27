@@ -92,13 +92,27 @@ function getStreetType(): string {
   return types[Math.floor(Math.random() * types.length)];
 }
 
-function generateSampleMenu(venueId: string) {
-  const restaurantNames = [
-    'The Cheesecake Factory', 'Olive Garden', 'Applebee\'s', 'TGI Friday\'s',
-    'Red Lobster', 'Outback Steakhouse', 'Buffalo Wild Wings', 'Chili\'s'
-  ];
-
-  const venueName = restaurantNames[Math.floor(Math.random() * restaurantNames.length)];
+async function generateSampleMenu(venueId: string) {
+  // First try to get real venue information from Google Places
+  const googleApiKey = process.env.GOOGLE_API_KEY;
+  let venueName = 'Restaurant';
+  let venueAddress = '123 Main Street';
+  
+  if (googleApiKey) {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${venueId}&fields=name,formatted_address,types&key=${googleApiKey}`
+      );
+      const data = await response.json();
+      
+      if (data.result) {
+        venueName = data.result.name || 'Restaurant';
+        venueAddress = data.result.formatted_address || '123 Main Street';
+      }
+    } catch (error) {
+      console.error('Error fetching venue details:', error);
+    }
+  }
   
   const appetizers = [
     { id: '1', name: 'Loaded Nachos', description: 'Crispy tortilla chips with cheese, jalapeños, and sour cream', price: 1299, category: 'Appetizers' },
@@ -107,10 +121,8 @@ function generateSampleMenu(venueId: string) {
   ];
 
   const mains = [
-    { id: '4', name: 'Grilled Salmon', description: 'Fresh Atlantic salmon with lemon herb butter and vegetables', price: 2899, category: 'Main Courses' },
-    { id: '5', name: 'BBQ Ribs', description: 'Slow-cooked baby back ribs with house BBQ sauce', price: 2699, category: 'Main Courses' },
-    { id: '6', name: 'Chicken Alfredo', description: 'Grilled chicken breast over fettuccine in creamy alfredo sauce', price: 2399, category: 'Main Courses' },
-    { id: '7', name: 'Classic Burger', description: 'Angus beef patty with lettuce, tomato, onion, and fries', price: 1899, category: 'Main Courses' }
+    // Generate restaurant-specific menu items based on venue name
+    ...generateRestaurantSpecificMenu(venueName)
   ];
 
   const drinks = [
@@ -127,9 +139,38 @@ function generateSampleMenu(venueId: string) {
   return {
     venueName: venueName,
     venueType: 'Restaurant',
-    address: '123 Main Street, Downtown',
+    address: venueAddress,
     menuItems: [...appetizers, ...mains, ...drinks, ...desserts]
   };
+}
+
+function generateRestaurantSpecificMenu(venueName: string) {
+  // Generate menu items based on the actual restaurant name
+  if (venueName.toLowerCase().includes('cheesecake')) {
+    return [
+      { id: '4', name: 'Chicken Madeira', description: 'Sautéed chicken breast with fresh asparagus and melted mozzarella', price: 2299, category: 'Main Courses' },
+      { id: '5', name: 'Shepherd\'s Pie', description: 'Ground beef, carrots, onions, and peas in a rich gravy', price: 1899, category: 'Main Courses' },
+      { id: '6', name: 'Fish & Chips', description: 'Fresh fish in crispy batter with seasoned fries', price: 2099, category: 'Main Courses' },
+    ];
+  } else if (venueName.toLowerCase().includes('olive garden')) {
+    return [
+      { id: '4', name: 'Fettuccine Alfredo', description: 'Creamy parmesan sauce with fettuccine pasta', price: 1699, category: 'Main Courses' },
+      { id: '5', name: 'Chicken Parmigiana', description: 'Crispy breaded chicken with marinara and mozzarella', price: 1999, category: 'Main Courses' },
+      { id: '6', name: 'Lasagna Classico', description: 'Layers of pasta, meat sauce, and three cheeses', price: 1799, category: 'Main Courses' },
+    ];
+  } else if (venueName.toLowerCase().includes('red lobster')) {
+    return [
+      { id: '4', name: 'Ultimate Feast', description: 'Maine lobster tail, garlic shrimp, and Walt\'s favorite shrimp', price: 3299, category: 'Main Courses' },
+      { id: '5', name: 'Lobster Linguini Alfredo', description: 'Roasted Maine lobster meat over linguini in alfredo sauce', price: 2899, category: 'Main Courses' },
+      { id: '6', name: 'Admiral\'s Feast', description: 'Walt\'s favorite shrimp, bay scallops, and clam strips', price: 2499, category: 'Main Courses' },
+    ];
+  } else {
+    return [
+      { id: '4', name: 'House Specialty', description: 'Chef\'s signature dish prepared with seasonal ingredients', price: 2299, category: 'Main Courses' },
+      { id: '5', name: 'Grilled Salmon', description: 'Fresh Atlantic salmon with lemon herb butter', price: 2599, category: 'Main Courses' },
+      { id: '6', name: 'Classic Burger', description: 'Angus beef patty with lettuce, tomato, and fries', price: 1699, category: 'Main Courses' },
+    ];
+  }
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -140,7 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Fetching menu for venue: ${venueId}`);
 
       // Generate sample menu data based on venue
-      const menuData = generateSampleMenu(venueId);
+      const menuData = await generateSampleMenu(venueId);
       res.json(menuData);
     } catch (error) {
       console.error('Error fetching menu:', error);

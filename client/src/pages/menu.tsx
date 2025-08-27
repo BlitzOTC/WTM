@@ -27,8 +27,17 @@ export default function MenuPage() {
   const venueId = params?.venueId;
 
   const handleBackClick = () => {
-    // Use browser history to go back to the previous page
-    window.history.back();
+    // Check if we have a 'from' parameter in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromPath = urlParams.get('from');
+    
+    if (fromPath) {
+      // Navigate back to the specific path with search parameters
+      navigate(fromPath);
+    } else {
+      // Fallback to browser back
+      window.history.back();
+    }
   };
 
   const { data: menuData, isLoading } = useQuery<MenuData>({

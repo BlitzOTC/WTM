@@ -119,7 +119,7 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
       <div className="absolute bottom-0 left-0 right-0 p-5 bg-white">
         <div className="flex space-x-2">
           {isRestaurantVenue && (
-            <Link to={`/menu/${event.id}`}>
+            <Link to={`/menu/${event.id}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`}>
               <Button
                 variant="outline"
                 size="sm"
