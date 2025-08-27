@@ -86,7 +86,17 @@ export default function AddFriends() {
     );
   };
 
-  const suggestedFriends: Friend[] = [
+  const handleSuggestedFollowToggle = (friendId: string) => {
+    setSuggestedFriends(prev => 
+      prev.map(friend => 
+        friend.id === friendId 
+          ? { ...friend, isFollowing: !friend.isFollowing }
+          : friend
+      )
+    );
+  };
+
+  const [suggestedFriends, setSuggestedFriends] = useState<Friend[]>([
     {
       id: '5',
       name: 'Lisa Park',
@@ -105,7 +115,7 @@ export default function AddFriends() {
       location: 'Palo Alto, CA',
       isFollowing: false
     }
-  ];
+  ]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 pb-20">
@@ -248,11 +258,18 @@ export default function AddFriends() {
                 </div>
                 <Button
                   size="sm"
-                  onClick={() => handleFollowToggle(friend.id)}
+                  variant={friend.isFollowing ? "outline" : "default"}
+                  onClick={() => handleSuggestedFollowToggle(friend.id)}
                   data-testid={`button-follow-${friend.id}`}
                 >
-                  <UserPlus className="h-4 w-4 mr-1" />
-                  Follow
+                  {friend.isFollowing ? (
+                    'Following'
+                  ) : (
+                    <>
+                      <UserPlus className="h-4 w-4 mr-1" />
+                      Follow
+                    </>
+                  )}
                 </Button>
               </div>
             ))}
