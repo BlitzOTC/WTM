@@ -187,7 +187,7 @@ export default function Profile() {
 
         {/* Stats */}
         <div className="bg-white rounded-lg p-6 mb-6 border border-gray-200">
-          <h3 className="font-semibold text-gray-900 mb-4">Your Stats</h3>
+          <h3 className="font-semibold text-gray-900 mb-4">My Events</h3>
           <div className="grid grid-cols-3 gap-4">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
