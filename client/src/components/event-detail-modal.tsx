@@ -1,5 +1,5 @@
 import { type Event } from "@shared/schema";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Clock, MapPin, User, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -69,6 +69,10 @@ export default function EventDetailModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0" data-testid="modal-event-detail">
+        <DialogTitle className="sr-only">{event.name} Details</DialogTitle>
+        <DialogDescription className="sr-only">
+          Detailed information about {event.name} at {event.venue}
+        </DialogDescription>
         <img 
           src={event.imageUrl || "https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=300"} 
           alt={event.name}

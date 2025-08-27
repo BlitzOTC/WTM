@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, DollarSign } from "lucide-react";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 
 interface MenuItem {
   id: string;
@@ -23,7 +23,13 @@ interface MenuData {
 
 export default function MenuPage() {
   const [match, params] = useRoute("/menu/:venueId");
+  const [, navigate] = useLocation();
   const venueId = params?.venueId;
+
+  const handleBackClick = () => {
+    // Use browser history to go back to the previous page
+    window.history.back();
+  };
 
   const { data: menuData, isLoading } = useQuery<MenuData>({
     queryKey: ["/api/menu", venueId],
@@ -52,12 +58,10 @@ export default function MenuPage() {
       <div className="min-h-screen bg-background p-4 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Menu not found</h1>
-          <Link to="/">
-            <Button variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Events
-            </Button>
-          </Link>
+          <Button variant="outline" onClick={handleBackClick}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Events
+          </Button>
         </div>
       </div>
     );
@@ -76,11 +80,9 @@ export default function MenuPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Link to="/">
-            <Button variant="outline" size="sm" data-testid="button-back">
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-          </Link>
+          <Button variant="outline" size="sm" data-testid="button-back" onClick={handleBackClick}>
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
           <div>
             <h1 className="text-3xl font-bold" data-testid="text-venue-name">{menuData.venueName}</h1>
             <p className="text-muted-foreground" data-testid="text-venue-address">{menuData.address}</p>
