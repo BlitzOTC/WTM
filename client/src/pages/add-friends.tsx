@@ -193,16 +193,16 @@ export default function AddFriends() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <div className="font-medium text-gray-900">{friend.name}</div>
+                      <button
+                        className="font-medium text-gray-900 hover:text-primary transition-colors text-left"
+                        onClick={() => window.location.href = `/friend-profile/${friend.id}`}
+                        data-testid={`button-friend-name-${friend.id}`}
+                      >
+                        {friend.name}
+                      </button>
                       <div className="text-sm text-gray-600">{friend.username}</div>
-                      <div className="flex items-center space-x-2 text-xs text-gray-500">
+                      <div className="text-xs text-gray-500">
                         <span>{friend.location}</span>
-                        {friend.mutualFriends > 0 && (
-                          <>
-                            <span>•</span>
-                            <span>{friend.mutualFriends} mutual friends</span>
-                          </>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -233,18 +233,16 @@ export default function AddFriends() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-medium text-gray-900">{friend.name}</div>
+                    <button
+                      className="font-medium text-gray-900 hover:text-primary transition-colors text-left"
+                      onClick={() => window.location.href = `/friend-profile/${friend.id}`}
+                      data-testid={`button-friend-name-${friend.id}`}
+                    >
+                      {friend.name}
+                    </button>
                     <div className="text-sm text-gray-600">{friend.username}</div>
-                    <div className="flex items-center space-x-2 text-xs text-gray-500">
+                    <div className="text-xs text-gray-500">
                       <span>{friend.location}</span>
-                      {friend.mutualFriends > 0 && (
-                        <>
-                          <span>•</span>
-                          <Badge variant="secondary" className="text-xs">
-                            {friend.mutualFriends} mutual friends
-                          </Badge>
-                        </>
-                      )}
                     </div>
                   </div>
                 </div>
