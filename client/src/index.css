@@ -107,3 +107,22 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Hide LastPass and other password manager overlays */
+[data-lastpass-icon-root],
+[data-lastpass-root],
+#lastpass-icon,
+.lp-fill-icon,
+.lp-icon,
+[data-dashlane-rid],
+[data-1p-ignore],
+.onepassword-extension-icon {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Additional styles to prevent password manager interference */
+input[type="search"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}

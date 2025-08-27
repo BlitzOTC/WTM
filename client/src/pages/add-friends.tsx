@@ -178,8 +178,15 @@ export default function AddFriends() {
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 data-testid="input-friend-search"
                 autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
                 data-form-type="other"
                 data-lpignore="true"
+                data-1p-ignore="true"
+                data-bwignore="true"
+                data-dashlane-rid=""
+                type="search"
               />
             </div>
             <Button 
