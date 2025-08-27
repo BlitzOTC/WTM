@@ -7,7 +7,7 @@ import NightPlan from "@/components/night-plan";
 import EventDetailModal from "@/components/event-detail-modal";
 import LocationSearch from "@/components/location-search";
 import { usePlan } from "@/hooks/use-plan";
-import { User, ChevronDown } from "lucide-react";
+import { UserPlus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -179,16 +179,26 @@ export default function Home() {
               </DropdownMenu>
             </div>
 
-            {/* Center Title */}
-            <div className="hidden md:flex flex-1 justify-center">
-              <h1 className="text-xl font-semibold text-gray-900">
-                {searchQuery ? `Events in ${searchQuery}` : 'Tonight - Find Real Events'}
+            {/* App Title */}
+            <div className="flex-1 text-center">
+              <h1 className="text-xl font-bold text-gray-900">
+                Whats the Move
               </h1>
+              {searchQuery && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Events in {searchQuery}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" data-testid="button-user-menu">
-                <User className="h-6 w-6" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => window.location.href = '/add-friends'}
+                data-testid="button-add-friends"
+              >
+                <UserPlus className="h-6 w-6" />
               </Button>
             </div>
           </div>
