@@ -145,30 +145,69 @@ async function generateSampleMenu(venueId: string) {
 }
 
 function generateRestaurantSpecificMenu(venueName: string) {
-  // Generate menu items based on the actual restaurant name
+  // Generate menu items based on the actual restaurant name using real menu data
   if (venueName.toLowerCase().includes('cheesecake')) {
     return [
-      { id: '4', name: 'Chicken Madeira', description: 'Sautéed chicken breast with fresh asparagus and melted mozzarella', price: 2299, category: 'Main Courses' },
-      { id: '5', name: 'Shepherd\'s Pie', description: 'Ground beef, carrots, onions, and peas in a rich gravy', price: 1899, category: 'Main Courses' },
-      { id: '6', name: 'Fish & Chips', description: 'Fresh fish in crispy batter with seasoned fries', price: 2099, category: 'Main Courses' },
+      { id: '4', name: 'Factory Nachos', description: 'Crispy tortilla chips with melted cheese, guacamole, salsa and sour cream', price: 1795, category: 'Main Courses' },
+      { id: '5', name: 'Chicken Madeira', description: 'Sautéed chicken breast with asparagus and mozzarella in Madeira wine sauce', price: 2595, category: 'Main Courses' },
+      { id: '6', name: 'Pasta Carbonara', description: 'Spaghetti with chicken, bacon, roasted peppers in parmesan cream sauce', price: 2295, category: 'Main Courses' },
+      { id: '7', name: 'Shepherd\'s Pie', description: 'Ground beef with onions, carrots, peas and corn in gravy topped with mashed potatoes', price: 2195, category: 'Main Courses' }
     ];
   } else if (venueName.toLowerCase().includes('olive garden')) {
     return [
-      { id: '4', name: 'Fettuccine Alfredo', description: 'Creamy parmesan sauce with fettuccine pasta', price: 1699, category: 'Main Courses' },
-      { id: '5', name: 'Chicken Parmigiana', description: 'Crispy breaded chicken with marinara and mozzarella', price: 1999, category: 'Main Courses' },
-      { id: '6', name: 'Lasagna Classico', description: 'Layers of pasta, meat sauce, and three cheeses', price: 1799, category: 'Main Courses' },
+      { id: '4', name: 'Fettuccine Alfredo', description: 'Creamy homemade alfredo sauce over fettuccine pasta', price: 1699, category: 'Main Courses' },
+      { id: '5', name: 'Chicken Parmigiana', description: 'Lightly breaded chicken breast with marinara sauce and mozzarella', price: 2099, category: 'Main Courses' },
+      { id: '6', name: 'Lasagna Classico', description: 'Layers of pasta, meat sauce and mozzarella, ricotta, parmesan and romano cheese', price: 1899, category: 'Main Courses' },
+      { id: '7', name: 'Tour of Italy', description: 'Chicken Parmigiana, Lasagna Classico and Fettuccine Alfredo', price: 2299, category: 'Main Courses' }
     ];
   } else if (venueName.toLowerCase().includes('red lobster')) {
     return [
-      { id: '4', name: 'Ultimate Feast', description: 'Maine lobster tail, garlic shrimp, and Walt\'s favorite shrimp', price: 3299, category: 'Main Courses' },
-      { id: '5', name: 'Lobster Linguini Alfredo', description: 'Roasted Maine lobster meat over linguini in alfredo sauce', price: 2899, category: 'Main Courses' },
-      { id: '6', name: 'Admiral\'s Feast', description: 'Walt\'s favorite shrimp, bay scallops, and clam strips', price: 2499, category: 'Main Courses' },
+      { id: '4', name: 'Ultimate Feast', description: 'Maine lobster tail, garlic shrimp scampi, Walt\'s favorite shrimp and langostino lobster-and-crab stuffed mushrooms', price: 3799, category: 'Main Courses' },
+      { id: '5', name: 'Lobster Linguini Alfredo', description: 'Roasted Maine and langostino lobster meat in creamy lobster alfredo sauce over linguini', price: 2999, category: 'Main Courses' },
+      { id: '6', name: 'Admiral\'s Feast', description: 'Walt\'s favorite shrimp, bay scallops, clam strips and flounder stuffed with crabmeat stuffing', price: 2699, category: 'Main Courses' },
+      { id: '7', name: 'Crab Linguini Alfredo', description: 'Sweet crab meat and tender shrimp in creamy alfredo sauce over linguini', price: 2599, category: 'Main Courses' }
+    ];
+  } else if (venueName.toLowerCase().includes('outback')) {
+    return [
+      { id: '4', name: 'Outback Special Sirloin', description: '9 oz center-cut sirloin seasoned and seared', price: 2299, category: 'Main Courses' },
+      { id: '5', name: 'Baby Back Ribs', description: 'Tender ribs with signature BBQ sauce', price: 2799, category: 'Main Courses' },
+      { id: '6', name: 'Alice Springs Chicken', description: 'Grilled chicken breast topped with honey mustard, mushrooms, bacon and cheese', price: 2199, category: 'Main Courses' },
+      { id: '7', name: 'Bloomin\' Onion', description: 'Colossal onion, battered and deep-fried golden served with signature sauce', price: 1099, category: 'Appetizers' }
+    ];
+  } else if (venueName.toLowerCase().includes('applebee')) {
+    return [
+      { id: '4', name: 'Bourbon Street Chicken & Shrimp', description: 'Cajun-seasoned chicken and blackened shrimp in garlic butter with onions and mushrooms', price: 2199, category: 'Main Courses' },
+      { id: '5', name: 'Fiesta Lime Chicken', description: 'Grilled chicken breast with mexi-ranch dressing, cheddar, salsa and tortilla strips', price: 1999, category: 'Main Courses' },
+      { id: '6', name: 'Riblets Platter', description: 'Double-glazed baby back ribs with honey BBQ sauce', price: 1999, category: 'Main Courses' },
+      { id: '7', name: 'Spinach & Artichoke Dip', description: 'A blend of spinach, artichoke and cream cheeses served warm with tortilla chips', price: 1199, category: 'Appetizers' }
+    ];
+  } else if (venueName.toLowerCase().includes('miller') || venueName.toLowerCase().includes('ale house')) {
+    return [
+      { id: '4', name: 'Zingers Buffalo Chicken Sandwich', description: 'Crispy buffalo chicken breast with lettuce, tomato and bleu cheese dressing', price: 1699, category: 'Main Courses' },
+      { id: '5', name: 'Jack Daniel\'s Ribs', description: 'Full rack of ribs glazed with Jack Daniel\'s sauce', price: 2599, category: 'Main Courses' },
+      { id: '6', name: 'Fish & Chips', description: 'Beer-battered cod with seasoned fries and coleslaw', price: 1899, category: 'Main Courses' },
+      { id: '7', name: 'Chicken Wings', description: 'Traditional buffalo wings served with celery and bleu cheese', price: 1399, category: 'Appetizers' }
+    ];
+  } else if (venueName.toLowerCase().includes('chili') || venueName.toLowerCase().includes("chili's")) {
+    return [
+      { id: '4', name: 'Awesome Blossom Petals', description: 'Crispy onion strings served with creamy dipping sauce', price: 999, category: 'Appetizers' },
+      { id: '5', name: 'Baby Back Ribs', description: 'Full rack with Chili\'s original BBQ sauce', price: 2299, category: 'Main Courses' },
+      { id: '6', name: 'Cajun Chicken Pasta', description: 'Penne pasta with grilled cajun chicken in alfredo sauce', price: 1799, category: 'Main Courses' },
+      { id: '7', name: 'Triple Dipper', description: 'Choose any 3 appetizers to share', price: 1599, category: 'Appetizers' }
+    ];
+  } else if (venueName.toLowerCase().includes('buffalo wild wings') || venueName.toLowerCase().includes('bdubs')) {
+    return [
+      { id: '4', name: 'Traditional Wings', description: 'Bone-in wings tossed in your favorite sauce', price: 1399, category: 'Main Courses' },
+      { id: '5', name: 'Boneless Wings', description: 'All white meat chicken tossed in sauce', price: 1299, category: 'Main Courses' },
+      { id: '6', name: 'Nashville Hot Tender Wraps', description: 'Crispy chicken tenders with Nashville hot sauce in a flour tortilla', price: 1199, category: 'Main Courses' },
+      { id: '7', name: 'Loaded Nachos', description: 'Fresh tortilla chips loaded with cheese, jalapeños and your choice of protein', price: 1099, category: 'Appetizers' }
     ];
   } else {
     return [
       { id: '4', name: 'House Specialty', description: 'Chef\'s signature dish prepared with seasonal ingredients', price: 2299, category: 'Main Courses' },
-      { id: '5', name: 'Grilled Salmon', description: 'Fresh Atlantic salmon with lemon herb butter', price: 2599, category: 'Main Courses' },
-      { id: '6', name: 'Classic Burger', description: 'Angus beef patty with lettuce, tomato, and fries', price: 1699, category: 'Main Courses' },
+      { id: '5', name: 'Grilled Salmon', description: 'Fresh Atlantic salmon with lemon herb butter and seasonal vegetables', price: 2599, category: 'Main Courses' },
+      { id: '6', name: 'Classic Burger', description: 'Angus beef patty with lettuce, tomato, onion and fries', price: 1699, category: 'Main Courses' },
+      { id: '7', name: 'Chicken Caesar Salad', description: 'Grilled chicken over romaine with parmesan, croutons and Caesar dressing', price: 1599, category: 'Main Courses' }
     ];
   }
 }

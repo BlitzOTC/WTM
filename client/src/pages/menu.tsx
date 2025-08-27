@@ -33,10 +33,10 @@ export default function MenuPage() {
     
     if (fromPath) {
       // Navigate back to the specific path with search parameters
-      navigate(fromPath);
+      navigate(decodeURIComponent(fromPath));
     } else {
-      // Fallback to browser back
-      window.history.back();
+      // Fallback to home page with current search context
+      navigate('/');
     }
   };
 
