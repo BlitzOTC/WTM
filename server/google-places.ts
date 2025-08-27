@@ -244,9 +244,9 @@ export class GooglePlacesService {
 
       return {
         id: venue.place_id,
-        name: listingName,
+        name: venue.name, // Use actual venue name from Google Places
         description: this.generateVenueDescription(venue.types, venue.name),
-        venue: venue.name,
+        venue: venue.name, // Venue name should match for restaurants
         address: venue.vicinity || venue.formatted_address || '',
         city: city,
         startTime: timeString,
