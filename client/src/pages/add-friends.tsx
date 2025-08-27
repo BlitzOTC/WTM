@@ -186,7 +186,7 @@ export default function AddFriends() {
                 data-1p-ignore="true"
                 data-bwignore="true"
                 data-dashlane-rid=""
-                type="search"
+                type="text"
               />
             </div>
             <Button 

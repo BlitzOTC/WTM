@@ -116,13 +116,27 @@
 .lp-icon,
 [data-dashlane-rid],
 [data-1p-ignore],
-.onepassword-extension-icon {
+.onepassword-extension-icon,
+div[data-lastpass-infield] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
 }
 
 /* Additional styles to prevent password manager interference */
-input[type="search"]::-webkit-credentials-auto-fill-button {
+input[type="search"]::-webkit-credentials-auto-fill-button,
+input[type="text"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}
+
+/* Override any LastPass styling */
+input[data-lpignore="true"] + div,
+input[data-lpignore="true"] ~ div,
+input[data-1p-ignore="true"] + div,
+input[data-1p-ignore="true"] ~ div {
   display: none !important;
 }
