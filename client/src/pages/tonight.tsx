@@ -4,9 +4,11 @@ import { type Event } from "@shared/schema";
 import EventCard from "@/components/event-card";
 import FilterSidebar from "@/components/filter-sidebar";
 import FiltersModal from "@/components/filters-modal";
+import EventDetailModal from "@/components/event-detail-modal";
+import HostEventModal from "@/components/host-event-modal";
 import LocationSearch from "@/components/location-search";
 import { usePlan } from "@/hooks/use-plan";
-import { Calendar, MapPin, Filter, ChevronDown } from "lucide-react";
+import { Calendar, MapPin, Filter, ChevronDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -35,6 +37,9 @@ export default function Tonight() {
   const [sortBy, setSortBy] = useState("time");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showFiltersModal, setShowFiltersModal] = useState(false);
+  const [showHostModal, setShowHostModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   // Parse location for API call - use location as is for better Google Places compatibility
   const location = searchQuery.trim();
@@ -117,8 +122,8 @@ export default function Tonight() {
   };
 
   const handleViewDetails = (event: Event) => {
-    // Handle event details view
-    console.log('View details for:', event.name);
+    setSelectedEvent(event);
+    setShowDetailModal(true);
   };
 
   if (isLoading) {
@@ -174,6 +179,14 @@ export default function Tonight() {
               </div>
             </div>
 
+            <Button
+              onClick={() => setShowHostModal(true)}
+              className="bg-primary text-white hover:bg-indigo-700 flex items-center space-x-2"
+              data-testid="button-host-event"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Host Event</span>
+            </Button>
           </div>
           
           {/* Location Search */}
@@ -271,6 +284,19 @@ export default function Tonight() {
         filters={filters}
         onFiltersChange={setFilters}
         data-testid="modal-filters"
+      />
+
+      {/* Host Event Modal */}
+      <HostEventModal
+        isOpen={showHostModal}
+        onClose={() => setShowHostModal(false)}
+      />
+
+      {/* Event Detail Modal */}
+      <EventDetailModal
+        isOpen={showDetailModal}
+        onClose={() => setShowDetailModal(false)}
+        event={selectedEvent}
       />
     </div>
   );
