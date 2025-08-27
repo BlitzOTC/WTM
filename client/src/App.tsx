@@ -19,6 +19,11 @@ import NotFound from "@/pages/not-found";
 import MenuPage from "@/pages/menu";
 import AddFriends from "@/pages/add-friends";
 import FriendProfile from "@/pages/friend-profile";
+import FriendFollowers from "@/pages/friend-followers";
+import FriendFollowing from "@/pages/friend-following";
+import FriendEventsAttended from "@/pages/friend-events-attended";
+import FriendEventsHosted from "@/pages/friend-events-hosted";
+import FriendCitiesExplored from "@/pages/friend-cities-explored";
 import MobileBottomNav from "@/components/mobile-bottom-nav";
 
 function Router() {
@@ -51,6 +56,11 @@ function Router() {
         <Route path="/menu/:venueId" component={MenuPage} />
         <Route path="/add-friends" component={AddFriends} />
         <Route path="/friend-profile/:friendId" component={FriendProfile} />
+        <Route path="/friend-followers/:friendId" component={FriendFollowers} />
+        <Route path="/friend-following/:friendId" component={FriendFollowing} />
+        <Route path="/friend-events-attended/:friendId" component={FriendEventsAttended} />
+        <Route path="/friend-events-hosted/:friendId" component={FriendEventsHosted} />
+        <Route path="/friend-cities-explored/:friendId" component={FriendCitiesExplored} />
         <Route component={NotFound} />
       </Switch>
       
