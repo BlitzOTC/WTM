@@ -27,7 +27,7 @@ export default function LocationSearch({ onLocationSelect, isLoading = false }: 
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = () => {
-    if (location.trim()) {
+    if (location.trim() && onLocationSelect && typeof onLocationSelect === 'function') {
       onLocationSelect(location.trim());
     }
   };
@@ -95,7 +95,9 @@ export default function LocationSearch({ onLocationSelect, isLoading = false }: 
   const handleSuggestionSelect = (suggestion: PlaceSuggestion) => {
     setLocation(suggestion.description);
     setShowSuggestions(false);
-    onLocationSelect(suggestion.description);
+    if (onLocationSelect && typeof onLocationSelect === 'function') {
+      onLocationSelect(suggestion.description);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -121,7 +123,9 @@ export default function LocationSearch({ onLocationSelect, isLoading = false }: 
             // Use coordinates for now, could add reverse geocoding via server endpoint later
             const coordsLocation = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
             setLocation(coordsLocation);
-            onLocationSelect(coordsLocation);
+            if (onLocationSelect && typeof onLocationSelect === 'function') {
+              onLocationSelect(coordsLocation);
+            }
           } finally {
             setIsGettingLocation(false);
           }
