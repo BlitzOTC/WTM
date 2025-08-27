@@ -214,7 +214,7 @@ export default function Plan() {
             <h3 className="text-lg font-medium text-gray-900 mb-2">No events in your plan</h3>
             <p className="text-gray-600 mb-4">Start adding events to create your perfect night</p>
             <Button 
-              onClick={() => window.history.back()}
+              onClick={() => window.location.href = '/tonight'}
               className="bg-primary text-white hover:bg-indigo-700"
               data-testid="button-browse-events"
             >

@@ -23,6 +23,10 @@ interface Filters {
 export default function Tonight() {
   const { addEvent, isInPlan } = usePlan();
   const [searchQuery, setSearchQuery] = useState("San Francisco, CA");
+
+  const handleLocationSelect = (location: string) => {
+    setSearchQuery(location);
+  };
   const [filters, setFilters] = useState<Filters>({
     categories: [],
     ageRequirements: [],
@@ -32,13 +36,12 @@ export default function Tonight() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showFiltersModal, setShowFiltersModal] = useState(false);
 
-  // Parse location for API call
-  const [city, state] = searchQuery.split(',').map(s => s.trim());
+  // Parse location for API call - use location as is for better Google Places compatibility
+  const location = searchQuery.trim();
 
   // Build query parameters
   const queryParams = new URLSearchParams();
-  if (city) queryParams.append('city', city);
-  if (state) queryParams.append('state', state);
+  if (location) queryParams.append('location', location);
   if (filters.categories.length > 0) {
     filters.categories.forEach(cat => queryParams.append('categories', cat));
   }
@@ -170,22 +173,13 @@ export default function Tonight() {
                 <h1 className="text-2xl font-bold text-gray-900">Tonight</h1>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFiltersModal(true)}
-              data-testid="button-filters"
-              className="flex items-center space-x-1"
-            >
-              <Filter className="h-4 w-4" />
-              <span>Filters</span>
-            </Button>
+
           </div>
           
           {/* Location Search */}
           <LocationSearch
             value={searchQuery}
-            onChange={setSearchQuery}
+            onLocationSelect={handleLocationSelect}
             placeholder="Search any city worldwide..."
           />
         </div>
@@ -210,17 +204,30 @@ export default function Tonight() {
             </p>
           </div>
           
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Sort..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="happening-now">Happening Now</SelectItem>
-              <SelectItem value="time">By Time</SelectItem>
-              <SelectItem value="price">By Price</SelectItem>
-              <SelectItem value="popularity">By Popularity</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFiltersModal(true)}
+              data-testid="button-filters-inline"
+              className="flex items-center space-x-1"
+            >
+              <Filter className="h-4 w-4" />
+              <span>Filters</span>
+            </Button>
+            
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Sort..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="happening-now">Happening Now</SelectItem>
+                <SelectItem value="time">By Time</SelectItem>
+                <SelectItem value="price">By Price</SelectItem>
+                <SelectItem value="popularity">By Popularity</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Events List */}
