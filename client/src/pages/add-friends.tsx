@@ -170,22 +170,15 @@ export default function AddFriends() {
           <div className="flex space-x-2 mb-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
+              <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by name or username..."
-                className="pl-10"
+                className="pl-10 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 data-testid="input-friend-search"
                 autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck="false"
-                data-form-type="other"
                 data-lpignore="true"
-                data-1p-ignore="true"
-                data-bwignore="true"
-                data-dashlane-rid=""
                 type="text"
               />
             </div>
