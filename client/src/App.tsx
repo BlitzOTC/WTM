@@ -25,6 +25,11 @@ import FriendEventsAttended from "@/pages/friend-events-attended";
 import FriendEventsHosted from "@/pages/friend-events-hosted";
 import FriendCitiesExplored from "@/pages/friend-cities-explored";
 import Login from "@/pages/login";
+import OnboardingAge from "@/pages/onboarding-age";
+import OnboardingLocation from "@/pages/onboarding-location";
+import OnboardingFrequency from "@/pages/onboarding-frequency";
+import OnboardingInterests from "@/pages/onboarding-interests";
+import OnboardingPreferences from "@/pages/onboarding-preferences";
 import MobileBottomNav from "@/components/mobile-bottom-nav";
 
 function Router() {
@@ -63,6 +68,11 @@ function Router() {
         <Route path="/friend-events-hosted/:friendId" component={FriendEventsHosted} />
         <Route path="/friend-cities-explored/:friendId" component={FriendCitiesExplored} />
         <Route path="/login" component={Login} />
+        <Route path="/onboarding/age" component={OnboardingAge} />
+        <Route path="/onboarding/location" component={OnboardingLocation} />
+        <Route path="/onboarding/frequency" component={OnboardingFrequency} />
+        <Route path="/onboarding/interests" component={OnboardingInterests} />
+        <Route path="/onboarding/preferences" component={OnboardingPreferences} />
         <Route component={NotFound} />
       </Switch>
       

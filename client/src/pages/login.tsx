@@ -94,11 +94,11 @@ export default function Login() {
       // Mock successful signup
       toast({
         title: "Account created!",
-        description: "Welcome to Whats the Move! You can now discover events.",
+        description: "Welcome to Whats the Move! Let's set up your preferences.",
       });
       
-      // Redirect to home page
-      window.location.href = "/";
+      // Redirect to onboarding for new users
+      window.location.href = "/onboarding/age";
     } catch (error) {
       toast({
         title: "Signup failed",
