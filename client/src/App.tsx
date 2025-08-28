@@ -24,6 +24,7 @@ import FriendFollowing from "@/pages/friend-following";
 import FriendEventsAttended from "@/pages/friend-events-attended";
 import FriendEventsHosted from "@/pages/friend-events-hosted";
 import FriendCitiesExplored from "@/pages/friend-cities-explored";
+import Login from "@/pages/login";
 import MobileBottomNav from "@/components/mobile-bottom-nav";
 
 function Router() {
@@ -61,6 +62,7 @@ function Router() {
         <Route path="/friend-events-attended/:friendId" component={FriendEventsAttended} />
         <Route path="/friend-events-hosted/:friendId" component={FriendEventsHosted} />
         <Route path="/friend-cities-explored/:friendId" component={FriendCitiesExplored} />
+        <Route path="/login" component={Login} />
         <Route component={NotFound} />
       </Switch>
       
