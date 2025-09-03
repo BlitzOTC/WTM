@@ -63,8 +63,12 @@ export default function EventDetailModal({
     
     if (platform === 'facebook') {
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
-    } else if (platform === 'twitter') {
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+    } else if (platform === 'instagram') {
+      // Instagram doesn't have direct URL sharing, so copy to clipboard
+      navigator.clipboard.writeText(`${text} ${url}`);
+      alert('Event details copied to clipboard! Paste in Instagram.');
+    } else if (platform === 'x' || platform === 'twitter') {
+      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
     }
   };
 
@@ -276,12 +280,20 @@ export default function EventDetailModal({
                     Facebook
                   </Button>
                   <Button
-                    onClick={() => handleShare('twitter')}
-                    className="flex-1 bg-sky-500 text-white hover:bg-sky-600"
+                    onClick={() => handleShare('instagram')}
+                    className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
                     size="sm"
-                    data-testid="button-share-twitter"
+                    data-testid="button-share-instagram"
                   >
-                    Twitter
+                    Instagram
+                  </Button>
+                  <Button
+                    onClick={() => handleShare('x')}
+                    className="flex-1 bg-black text-white hover:bg-gray-800"
+                    size="sm"
+                    data-testid="button-share-x"
+                  >
+                    X
                   </Button>
                 </div>
               </div>
