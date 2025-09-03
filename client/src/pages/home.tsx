@@ -217,6 +217,7 @@ export default function Home() {
                   variant="outline" 
                   size="sm" 
                   onClick={() => setSearchQuery("")}
+                  className="flex items-center gap-1 border-2 border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 hover:border-blue-400 hover:text-blue-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
                 >
                   Change Location
                 </Button>
