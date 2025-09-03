@@ -26,7 +26,7 @@ export default function OnboardingPreferences() {
     { value: "solo", label: "Solo adventures", description: "Just me" },
     { value: "small", label: "Small groups", description: "2-4 people" },
     { value: "medium", label: "Medium groups", description: "5-10 people" },
-    { value: "varies", label: "It varies", description: "Depends on mood" }
+    { value: "flexible", label: "Flexible", description: "Any size" }
   ];
 
   const timePreferences = [
