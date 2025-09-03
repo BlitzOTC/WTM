@@ -94,11 +94,6 @@ export default function OnboardingLocation() {
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 mr-3 text-gray-400" />
                     <span>{location}</span>
-                    {selectedLocation === location && (
-                      <div className="ml-auto w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                      </div>
-                    )}
                   </div>
                 </button>
               ))}

@@ -76,11 +76,6 @@ export default function OnboardingInterests() {
                     <Icon className="h-6 w-6" />
                   </div>
                   <div className="text-sm font-medium">{interest.label}</div>
-                  {isSelected && (
-                    <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center mx-auto mt-2">
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
-                    </div>
-                  )}
                 </button>
               );
             })}
