@@ -150,7 +150,7 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 border-2 border-red-300 text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-400 hover:text-red-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
                 data-testid={`button-menu-${event.id}`}
               >
                 <Menu className="h-4 w-4" />
