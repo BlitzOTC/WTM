@@ -131,6 +131,46 @@ export default function Profile() {
                   <p className="text-gray-600">{profileData.email}</p>
                   
                   {/* Followers/Following Stats */}
+                  {/* Interest Tags */}
+                  {(() => {
+                    const onboardingData = localStorage.getItem('onboarding_data');
+                    const preferences = onboardingData ? JSON.parse(onboardingData) : null;
+                    const interests = preferences?.interests || [];
+
+                    if (interests.length > 0) {
+                      const interestConfig = {
+                        music: { label: "Music", color: "bg-purple-100 text-purple-700 border-purple-200" },
+                        food: { label: "Food & Dining", color: "bg-red-100 text-red-700 border-red-200" },
+                        drinks: { label: "Bars & Nightlife", color: "bg-orange-100 text-orange-700 border-orange-200" },
+                        sports: { label: "Sports", color: "bg-green-100 text-green-700 border-green-200" },
+                        culture: { label: "Arts & Culture", color: "bg-pink-100 text-pink-700 border-pink-200" },
+                        networking: { label: "Networking", color: "bg-blue-100 text-blue-700 border-blue-200" },
+                        gaming: { label: "Gaming", color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
+                        events: { label: "Special Events", color: "bg-yellow-100 text-yellow-700 border-yellow-200" }
+                      };
+
+                      return (
+                        <div className="mt-3">
+                          <div className="flex flex-wrap gap-2">
+                            {interests.map((interest: string) => {
+                              const config = interestConfig[interest as keyof typeof interestConfig];
+                              return config ? (
+                                <span
+                                  key={interest}
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${config.color}`}
+                                  data-testid={`interest-tag-${interest}`}
+                                >
+                                  {config.label}
+                                </span>
+                              ) : null;
+                            })}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
                   <div className="flex items-center space-x-4 mt-3">
                     <button 
                       onClick={() => setLocation('/followers')}

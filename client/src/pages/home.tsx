@@ -258,6 +258,106 @@ export default function Home() {
               </div>
             ) : (
               <>
+                {/* Recommended Events Section */}
+                <div className="mb-8">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Recommended Events</h2>
+                  {(() => {
+                    // Get onboarding data from localStorage
+                    const onboardingData = localStorage.getItem('onboarding_data');
+                    const preferences = onboardingData ? JSON.parse(onboardingData) : null;
+                    
+                    if (!preferences) {
+                      return (
+                        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+                          <p className="text-gray-600 mb-3">Complete your profile setup to see personalized recommendations</p>
+                          <Button 
+                            onClick={() => window.location.href = '/onboarding/age'} 
+                            variant="outline"
+                            data-testid="button-complete-profile"
+                          >
+                            Complete Profile
+                          </Button>
+                        </div>
+                      );
+                    }
+
+                    // Filter events based on user preferences
+                    const recommendedEvents = events.filter(event => {
+                      // Filter by interests
+                      if (preferences.interests && preferences.interests.length > 0) {
+                        const eventMatchesInterests = preferences.interests.some((interest: string) => {
+                          // Use event.name instead of event.title, and handle categories as string array
+                          const eventCategoriesArray = Array.isArray(event.categories) ? event.categories : [];
+                          switch (interest) {
+                            case 'music': return eventCategoriesArray.includes('music') || event.name?.toLowerCase().includes('music');
+                            case 'food': return eventCategoriesArray.includes('food') || event.name?.toLowerCase().includes('food') || event.name?.toLowerCase().includes('dining');
+                            case 'drinks': return eventCategoriesArray.includes('nightlife') || event.name?.toLowerCase().includes('bar') || event.name?.toLowerCase().includes('drinks');
+                            case 'sports': return eventCategoriesArray.includes('sports') || event.name?.toLowerCase().includes('sports');
+                            case 'culture': return eventCategoriesArray.includes('arts') || event.name?.toLowerCase().includes('art') || event.name?.toLowerCase().includes('culture');
+                            case 'networking': return eventCategoriesArray.includes('networking') || event.name?.toLowerCase().includes('networking');
+                            case 'gaming': return eventCategoriesArray.includes('gaming') || event.name?.toLowerCase().includes('gaming');
+                            case 'events': return eventCategoriesArray.includes('entertainment') || event.name?.toLowerCase().includes('entertainment');
+                            default: return false;
+                          }
+                        });
+                        if (!eventMatchesInterests) return false;
+                      }
+
+                      // Filter by budget preferences
+                      if (preferences.preferences?.priceRange && preferences.preferences.priceRange.length > 0) {
+                        const budgetMatch = preferences.preferences.priceRange.some((range: string) => {
+                          switch (range) {
+                            case 'free': return event.price === 0;
+                            case 'budget': return event.price > 0 && event.price <= 25;
+                            case 'moderate': return event.price >= 25;
+                            case 'flexible': return true;
+                            default: return false;
+                          }
+                        });
+                        if (!budgetMatch) return false;
+                      }
+
+                      return true;
+                    }).slice(0, 3); // Show top 3 recommendations
+
+                    if (recommendedEvents.length === 0) {
+                      return (
+                        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+                          <p className="text-gray-600 text-sm">No recommendations found for your preferences in {searchQuery}</p>
+                          <p className="text-gray-500 text-xs mt-1">Try searching a different city or adjusting your preferences</p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {recommendedEvents.map((event) => (
+                          <div key={event.id} className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-lg p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <span className="inline-block px-2 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full">
+                                Recommended
+                              </span>
+                              <span className="text-sm font-medium text-gray-900">${event.price}</span>
+                            </div>
+                            <h3 className="font-medium text-gray-900 mb-2">{event.name}</h3>
+                            <p className="text-sm text-gray-600 mb-2">{event.venue}</p>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-gray-600">{event.startTime}</span>
+                              <Button
+                                size="sm"
+                                onClick={() => handleViewDetails(event)}
+                                data-testid={`button-view-recommended-${event.id}`}
+                              >
+                                View Details
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900" data-testid="text-page-title">

@@ -6,6 +6,8 @@ This is a full-stack nightlife and event discovery application built with a mode
 
 ## Recent Changes (September 3, 2025)
 
+- **Personalized Event Recommendations**: Added smart recommendations section on search page based on user's onboarding preferences (interests, budget, etc.)
+- **Profile Interest Tags**: Added colored interest badges to user profiles showing selected event preferences from onboarding
 - **Complete Onboarding Funnel**: Built 5-step user preference collection flow after signup (age, location, frequency, interests, preferences)
 - **Enhanced Authentication**: Added functional social login (Google/Apple) and guest access option to login page
 - **Streamlined Signup**: Removed location field from signup form - now prompts for location permission within app
