@@ -217,14 +217,12 @@ export default function Profile() {
 
           if (interests.length > 0) {
             const interestConfig = {
-              music: { label: "Music", color: "bg-purple-100 text-purple-700 border-purple-200" },
+              music: { label: "Live Music", color: "bg-purple-100 text-purple-700 border-purple-200" },
               food: { label: "Food & Dining", color: "bg-red-100 text-red-700 border-red-200" },
-              drinks: { label: "Bars & Nightlife", color: "bg-orange-100 text-orange-700 border-orange-200" },
-              sports: { label: "Sports", color: "bg-green-100 text-green-700 border-green-200" },
-              culture: { label: "Arts & Culture", color: "bg-pink-100 text-pink-700 border-pink-200" },
-              networking: { label: "Networking", color: "bg-blue-100 text-blue-700 border-blue-200" },
-              gaming: { label: "Gaming", color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
-              events: { label: "Special Events", color: "bg-yellow-100 text-yellow-700 border-yellow-200" }
+              drinks: { label: "Cocktails", color: "bg-orange-100 text-orange-700 border-orange-200" },
+              dancing: { label: "Dancing", color: "bg-pink-100 text-pink-700 border-pink-200" },
+              entertainment: { label: "Entertainment", color: "bg-blue-100 text-blue-700 border-blue-200" },
+              sports: { label: "Sports & Games", color: "bg-green-100 text-green-700 border-green-200" }
             };
 
             return (

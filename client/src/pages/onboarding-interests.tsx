@@ -1,19 +1,17 @@
 import { useState } from "react";
-import { ChevronRight, Music, Utensils, Gamepad2, Palette, Users, Wine, Calendar, Trophy } from "lucide-react";
+import { ChevronRight, Music, Utensils, Palette, Users, Wine, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function OnboardingInterests() {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   const interests = [
-    { value: "music", label: "Music & Concerts", icon: Music, color: "bg-purple-100 text-purple-600 border-purple-200" },
+    { value: "music", label: "Live Music", icon: Music, color: "bg-purple-100 text-purple-600 border-purple-200" },
     { value: "food", label: "Food & Dining", icon: Utensils, color: "bg-red-100 text-red-600 border-red-200" },
-    { value: "drinks", label: "Bars & Nightlife", icon: Wine, color: "bg-orange-100 text-orange-600 border-orange-200" },
-    { value: "sports", label: "Sports & Games", icon: Trophy, color: "bg-green-100 text-green-600 border-green-200" },
-    { value: "culture", label: "Arts & Culture", icon: Palette, color: "bg-pink-100 text-pink-600 border-pink-200" },
-    { value: "networking", label: "Networking", icon: Users, color: "bg-blue-100 text-blue-600 border-blue-200" },
-    { value: "gaming", label: "Gaming", icon: Gamepad2, color: "bg-indigo-100 text-indigo-600 border-indigo-200" },
-    { value: "events", label: "Special Events", icon: Calendar, color: "bg-yellow-100 text-yellow-600 border-yellow-200" }
+    { value: "drinks", label: "Cocktails", icon: Wine, color: "bg-orange-100 text-orange-600 border-orange-200" },
+    { value: "dancing", label: "Dancing", icon: Users, color: "bg-pink-100 text-pink-600 border-pink-200" },
+    { value: "entertainment", label: "Entertainment", icon: Palette, color: "bg-blue-100 text-blue-600 border-blue-200" },
+    { value: "sports", label: "Sports & Games", icon: Trophy, color: "bg-green-100 text-green-600 border-green-200" }
   ];
 
   const handleInterestToggle = (interest: string) => {

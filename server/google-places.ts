@@ -256,7 +256,7 @@ export class GooglePlacesService {
         capacity: Math.floor(Math.random() * 200) + 50,
         attendees: Math.floor(Math.random() * 150) + 10,
         imageUrl: imageUrl,
-        ticketLinks: {},
+        ticketLinks: this.generateTicketLinks(venue.name, categories),
         rating: venue.rating || Math.floor(Math.random() * 15) + 35 / 10
       } as Event;
     });
@@ -321,6 +321,46 @@ export class GooglePlacesService {
         ageRequirement: '18'
       };
     }
+  }
+
+  private generateTicketLinks(venueName: string, categories: string[]): Record<string, string> {
+    const links: Record<string, string> = {};
+    
+    // Major venues and entertainment venues typically have tickets
+    const majorVenues = ['Garden', 'Arena', 'Center', 'Bowl', 'Theater', 'Theatre', 'Hall'];
+    const musicVenues = ['Blue Note', 'Apollo', 'Beacon', 'Lincoln Center', 'Madison Square'];
+    const theaterVenues = ['Broadway', 'Playhouse', 'Opera House', 'Symphony'];
+    
+    const isMajor = majorVenues.some(type => venueName.includes(type));
+    const isMusic = musicVenues.some(type => venueName.includes(type)) || categories.includes('music');
+    const isTheater = theaterVenues.some(type => venueName.includes(type)) || categories.includes('entertainment');
+    
+    // Only add ticket links for venues that typically sell tickets
+    if (isMajor || isMusic || isTheater) {
+      const venueSlug = venueName.replace(/\s+/g, '-').toLowerCase();
+      
+      // Major venues get multiple ticket sources
+      if (isMajor) {
+        links.ticketmaster = `https://ticketmaster.com/venue/${venueSlug}`;
+        links.stubhub = `https://stubhub.com/venue/${venueSlug}`;
+        if (Math.random() > 0.5) { // 50% chance of SeatGeek
+          links.seatgeek = `https://seatgeek.com/venues/${venueSlug}`;
+        }
+      }
+      // Music venues typically use Ticketmaster
+      else if (isMusic) {
+        links.ticketmaster = `https://ticketmaster.com/venue/${venueSlug}`;
+        if (Math.random() > 0.7) { // 30% chance of StubHub
+          links.stubhub = `https://stubhub.com/venue/${venueSlug}`;
+        }
+      }
+      // Theater venues often use specialized ticketing
+      else if (isTheater) {
+        links.ticketmaster = `https://ticketmaster.com/venue/${venueSlug}`;
+      }
+    }
+    
+    return links;
   }
 
   private generateVenuePrice(venueTypes: string[], priceLevel?: number): number {

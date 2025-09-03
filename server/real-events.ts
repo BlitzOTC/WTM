@@ -86,16 +86,21 @@ export class EnhancedVenueEventGenerator {
         venue: venue,
         address: this.generateRealisticAddress(cityKey),
         city: location.split(',')[0].trim(),
+        state: 'CA', // Default state
         startTime: timeString,
+        endTime: null,
         price: price,
-        categories: this.getEventCategories(eventType),
         ageRequirement: this.getAgeRequirement(eventType),
-        capacity: this.getVenueCapacity(venue),
-        attendees: Math.floor(Math.random() * 200) + 20,
+        dressCode: null,
+        categories: this.getEventCategories(eventType),
+        eventType: 'venue',
+        privacy: 'public',
+        hostId: 'system',
+        maxCapacity: this.getVenueCapacity(venue),
+        currentAttendees: Math.floor(Math.random() * 200) + 20,
         imageUrl: this.getVenueImageUrl(venue, cityKey),
-        ticketLinks: this.generateTicketLinks(venue, eventType),
-        rating: Math.floor(Math.random() * 15) + 35 / 10 // 3.5-5.0 scale
-      } as Event);
+        ticketLinks: this.generateTicketLinks(venue, eventType)
+      });
     }
 
     return events;
@@ -133,7 +138,7 @@ export class EnhancedVenueEventGenerator {
   }
 
   private static generateEventDescription(eventType: string, venue: string, location: string): string {
-    const descriptions = {
+    const descriptions: Record<string, string> = {
       'concert': `Experience an unforgettable live music performance at ${venue}. Join us for an evening of incredible sounds and energy in the heart of ${location}.`,
       'comedy': `Get ready to laugh until your sides hurt at ${venue}'s comedy night. Featuring talented comedians and special guests.`,
       'theater': `Immerse yourself in a captivating theatrical experience at ${venue}. A must-see performance that will leave you spellbound.`,
@@ -146,7 +151,7 @@ export class EnhancedVenueEventGenerator {
   }
 
   private static generateRealisticPrice(eventType: string, venue: string): number {
-    const priceRanges = {
+    const priceRanges: Record<string, { min: number; max: number }> = {
       'concert': { min: 2500, max: 12000 }, // $25-120
       'comedy': { min: 1500, max: 5000 },   // $15-50
       'theater': { min: 3000, max: 15000 }, // $30-150
@@ -165,7 +170,7 @@ export class EnhancedVenueEventGenerator {
   }
 
   private static getEventCategories(eventType: string): string[] {
-    const categoryMap = {
+    const categoryMap: Record<string, string[]> = {
       'concert': ['music'],
       'comedy': ['entertainment'],
       'theater': ['entertainment'],
