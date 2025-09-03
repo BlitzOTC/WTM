@@ -91,12 +91,85 @@ export default function Tonight() {
   });
 
   // Sort events
+  // Get user preferences from onboarding data
+  const getUserPreferences = () => {
+    try {
+      const onboardingData = localStorage.getItem('onboarding_data');
+      if (onboardingData) {
+        const data = JSON.parse(onboardingData);
+        return {
+          interests: data.interests || [],
+          budget: data.budget || 'moderate',
+          ageRange: data.ageRange || '25-29',
+          frequency: data.frequency || 'weekly'
+        };
+      }
+    } catch (error) {
+      console.error('Error parsing onboarding data:', error);
+    }
+    return null;
+  };
+
+  const userPreferences = getUserPreferences();
+
+  // Calculate recommendation score for events
+  const getRecommendationScore = (event: Event) => {
+    if (!userPreferences) return 0;
+    
+    let score = 0;
+    const eventCategories = Array.isArray(event.categories) ? event.categories : [];
+    
+    // Boost events matching user interests
+    eventCategories.forEach(category => {
+      if (userPreferences.interests.includes(category)) {
+        score += 3;
+      }
+    });
+    
+    // Boost events within budget preference
+    const eventPrice = event.price / 100;
+    if (userPreferences.budget === 'free' && eventPrice === 0) {
+      score += 2;
+    } else if (userPreferences.budget === 'budget' && eventPrice <= 15) {
+      score += 2;
+    } else if (userPreferences.budget === 'moderate' && eventPrice <= 35) {
+      score += 2;
+    } else if (userPreferences.budget === 'flexible') {
+      score += 1; // Flexible with any price
+    }
+    
+    // Boost based on age range preference
+    if (userPreferences.ageRange === 'under-18' && event.ageRequirement === 'all') {
+      score += 1;
+    } else if (userPreferences.ageRange === '18-24' && ['all', '18'].includes(event.ageRequirement)) {
+      score += 1;
+    } else if (['25-29', '30-34', '35-39', '40+'].includes(userPreferences.ageRange) && ['all', '18', '21'].includes(event.ageRequirement)) {
+      score += 1;
+    }
+    
+    return score;
+  };
+
+  // Get recommended events
+  const recommendedEvents = userPreferences 
+    ? [...tonightEvents]
+        .map(event => ({ ...event, recommendationScore: getRecommendationScore(event) }))
+        .filter(event => event.recommendationScore > 0)
+        .sort((a, b) => b.recommendationScore - a.recommendationScore)
+        .slice(0, 4)
+    : [];
+
   const sortedEvents = [...tonightEvents].sort((a, b) => {
     switch (sortBy) {
       case 'price':
         return a.price - b.price;
       case 'popularity':
         return (b.currentAttendees || 0) - (a.currentAttendees || 0);
+      case 'recommended':
+        const scoreA = getRecommendationScore(a);
+        const scoreB = getRecommendationScore(b);
+        if (scoreA !== scoreB) return scoreB - scoreA;
+        return a.startTime.localeCompare(b.startTime);
       case 'happening-now':
         const now = new Date();
         const currentTime = now.getHours() * 60 + now.getMinutes();
