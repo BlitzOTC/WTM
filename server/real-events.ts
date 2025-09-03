@@ -93,7 +93,7 @@ export class EnhancedVenueEventGenerator {
         capacity: this.getVenueCapacity(venue),
         attendees: Math.floor(Math.random() * 200) + 20,
         imageUrl: this.getVenueImageUrl(venue, cityKey),
-        ticketLinks: this.generateTicketLinks(venue),
+        ticketLinks: this.generateTicketLinks(venue, eventType),
         rating: Math.floor(Math.random() * 15) + 35 / 10 // 3.5-5.0 scale
       } as Event);
     }
@@ -235,16 +235,41 @@ export class EnhancedVenueEventGenerator {
     return `https://images.unsplash.com/photo-${imageId}?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=240`;
   }
 
-  private static generateTicketLinks(venue: string): Record<string, string> {
+  private static generateTicketLinks(venue: string, eventType?: string): Record<string, string> {
     const links: Record<string, string> = {};
     
     // Major venues typically have multiple ticket sources
-    const majorVenues = ['Garden', 'Arena', 'Center', 'Bowl', 'Theater'];
-    const isMajor = majorVenues.some(type => venue.includes(type));
+    const majorVenues = ['Garden', 'Arena', 'Center', 'Bowl', 'Theater', 'Theatre'];
+    const concertVenues = ['House of Blues', 'Blue Note', 'Whisky', 'Troubadour', 'Webster Hall'];
+    const theaterVenues = ['Lincoln Center', 'Broadway', 'Playhouse', 'Dr. Phillips'];
     
-    if (isMajor) {
-      links.ticketmaster = `https://ticketmaster.com/venue/${venue.replace(/\s+/g, '-').toLowerCase()}`;
-      links.stubhub = `https://stubhub.com/venue/${venue.replace(/\s+/g, '-').toLowerCase()}`;
+    const isMajor = majorVenues.some(type => venue.includes(type));
+    const isConcert = concertVenues.some(type => venue.includes(type)) || eventType === 'concert';
+    const isTheater = theaterVenues.some(type => venue.includes(type)) || eventType === 'theater';
+    
+    // Add ticket links based on venue type and event type
+    if (isMajor || isConcert || isTheater) {
+      const venueSlug = venue.replace(/\s+/g, '-').toLowerCase();
+      
+      // Major venues get multiple ticket sources
+      if (isMajor) {
+        links.ticketmaster = `https://ticketmaster.com/venue/${venueSlug}`;
+        links.stubhub = `https://stubhub.com/venue/${venueSlug}`;
+        if (Math.random() > 0.5) { // 50% chance of SeatGeek
+          links.seatgeek = `https://seatgeek.com/venues/${venueSlug}`;
+        }
+      }
+      // Concert venues typically use Ticketmaster
+      else if (isConcert) {
+        links.ticketmaster = `https://ticketmaster.com/venue/${venueSlug}`;
+        if (Math.random() > 0.7) { // 30% chance of StubHub
+          links.stubhub = `https://stubhub.com/venue/${venueSlug}`;
+        }
+      }
+      // Theater venues often use specialized ticketing
+      else if (isTheater) {
+        links.ticketmaster = `https://ticketmaster.com/venue/${venueSlug}`;
+      }
     }
     
     return links;

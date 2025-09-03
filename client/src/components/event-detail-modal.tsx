@@ -44,7 +44,9 @@ export default function EventDetailModal({
   };
 
   const categories = Array.isArray(event.categories) ? event.categories : [];
-  const ticketLinks = event.ticketLinks || {};
+  const ticketLinks = typeof event.ticketLinks === 'object' && event.ticketLinks !== null 
+    ? event.ticketLinks as Record<string, string>
+    : {} as Record<string, string>;
 
   const handleTicketClick = (platform: string, url?: string) => {
     if (url) {

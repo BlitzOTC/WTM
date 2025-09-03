@@ -1,5 +1,5 @@
 import { type Event } from "@shared/schema";
-import { Clock, MapPin, Menu } from "lucide-react";
+import { Clock, MapPin, Menu, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
@@ -43,12 +43,39 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
     return `${displayHour}:${minutes} ${ampm}`;
   };
 
+  const handleTicketClick = () => {
+    // Get ticket links from event
+    const ticketLinks = typeof event.ticketLinks === 'object' && event.ticketLinks !== null 
+      ? event.ticketLinks as Record<string, string>
+      : {};
+    
+    // Find first available ticket link
+    const ticketmaster = ticketLinks.ticketmaster;
+    const stubhub = ticketLinks.stubhub;
+    const seatgeek = ticketLinks.seatgeek;
+    
+    // Open first available ticket link
+    if (ticketmaster) {
+      window.open(ticketmaster, '_blank');
+    } else if (stubhub) {
+      window.open(stubhub, '_blank');
+    } else if (seatgeek) {
+      window.open(seatgeek, '_blank');
+    }
+  };
+
   const categories = Array.isArray(event.categories) ? event.categories : [];
   
   // Determine if this is a restaurant/bar without an event
   const isRestaurantVenue = categories.includes('food') && event.name === event.venue;
   const isBarVenue = (categories.includes('drinks') || categories.includes('dancing')) && event.name === event.venue;
   const isVenueOnly = isRestaurantVenue || isBarVenue;
+  
+  // Check if tickets are available
+  const ticketLinks = typeof event.ticketLinks === 'object' && event.ticketLinks !== null 
+    ? event.ticketLinks as Record<string, string>
+    : {};
+  const hasTickets = ticketLinks.ticketmaster || ticketLinks.stubhub || ticketLinks.seatgeek;
   
   // Determine display structure
   const mainTitle = event.name;
@@ -140,6 +167,18 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
           >
             {isInPlan ? 'In Plan' : 'Add to Plan'}
           </Button>
+          {hasTickets && (
+            <Button
+              onClick={handleTicketClick}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 border-green-300 text-green-700 hover:bg-green-50"
+              data-testid={`button-tickets-${event.id}`}
+            >
+              <Ticket className="h-4 w-4" />
+              Tickets
+            </Button>
+          )}
           <Button
             onClick={() => onViewDetails(event)}
             variant="outline"
