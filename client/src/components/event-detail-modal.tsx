@@ -194,7 +194,7 @@ export default function EventDetailModal({
                       {ticketLinks.ticketmaster && (
                         <Button
                           onClick={() => handleTicketClick('Ticketmaster', ticketLinks.ticketmaster)}
-                          className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                          className="w-full bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg transition-all duration-200 font-medium transform hover:scale-105"
                           size="sm"
                           data-testid="button-ticket-ticketmaster"
                         >
@@ -204,7 +204,7 @@ export default function EventDetailModal({
                       {ticketLinks.stubhub && (
                         <Button
                           onClick={() => handleTicketClick('StubHub', ticketLinks.stubhub)}
-                          className="w-full bg-orange-600 text-white hover:bg-orange-700"
+                          className="w-full bg-orange-600 text-white hover:bg-orange-700 hover:shadow-lg transition-all duration-200 font-medium transform hover:scale-105"
                           size="sm"
                           data-testid="button-ticket-stubhub"
                         >
@@ -214,7 +214,7 @@ export default function EventDetailModal({
                       {ticketLinks.seatgeek && (
                         <Button
                           onClick={() => handleTicketClick('SeatGeek', ticketLinks.seatgeek)}
-                          className="w-full bg-green-600 text-white hover:bg-green-700"
+                          className="w-full bg-green-600 text-white hover:bg-green-700 hover:shadow-lg transition-all duration-200 font-medium transform hover:scale-105"
                           size="sm"
                           data-testid="button-ticket-seatgeek"
                         >

@@ -172,7 +172,7 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
               onClick={handleTicketClick}
               variant="outline"
               size="sm"
-              className="flex items-center gap-1 border-green-300 text-green-700 hover:bg-green-50"
+              className="flex items-center gap-1 border-2 border-green-400 text-green-700 bg-green-50 hover:bg-green-100 hover:border-green-500 hover:text-green-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
               data-testid={`button-tickets-${event.id}`}
             >
               <Ticket className="h-4 w-4" />
