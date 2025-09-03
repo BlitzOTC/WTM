@@ -145,7 +145,29 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
       {/* Fixed positioned buttons at bottom */}
       <div className="absolute bottom-0 left-0 right-0 p-5 bg-white">
         <div className="flex space-x-2">
-          {/* Left side buttons */}
+          {/* Left side - Details button */}
+          <Button
+            onClick={() => onViewDetails(event)}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1 border-2 border-yellow-400 text-yellow-700 bg-yellow-50 hover:bg-yellow-100 hover:border-yellow-500 hover:text-yellow-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+            data-testid={`button-view-details-${event.id}`}
+          >
+            Details
+          </Button>
+          
+          {/* Center - Add to Plan button */}
+          <Button
+            onClick={() => onAddToPlan(event)}
+            disabled={isInPlan}
+            className="flex-1 bg-primary text-white hover:bg-indigo-700 disabled:bg-gray-300"
+            size="sm"
+            data-testid={`button-add-to-plan-${event.id}`}
+          >
+            {isInPlan ? 'In Plan' : 'Add to Plan'}
+          </Button>
+          
+          {/* Right side - Menu and Tickets buttons */}
           <div className="flex space-x-2">
             {isRestaurantVenue && (
               <Link to={`/menu/${event.id}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`}>
@@ -173,28 +195,6 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
               </Button>
             )}
           </div>
-          
-          {/* Center button */}
-          <Button
-            onClick={() => onAddToPlan(event)}
-            disabled={isInPlan}
-            className="flex-1 bg-primary text-white hover:bg-indigo-700 disabled:bg-gray-300"
-            size="sm"
-            data-testid={`button-add-to-plan-${event.id}`}
-          >
-            {isInPlan ? 'In Plan' : 'Add to Plan'}
-          </Button>
-          
-          {/* Right side button */}
-          <Button
-            onClick={() => onViewDetails(event)}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1 border-2 border-yellow-400 text-yellow-700 bg-yellow-50 hover:bg-yellow-100 hover:border-yellow-500 hover:text-yellow-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
-            data-testid={`button-view-details-${event.id}`}
-          >
-            Details
-          </Button>
         </div>
       </div>
     </div>
