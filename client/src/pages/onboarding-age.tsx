@@ -6,12 +6,12 @@ export default function OnboardingAge() {
   const [selectedAge, setSelectedAge] = useState<string>("");
 
   const ageRanges = [
+    { value: "16-18", label: "16-18 years old" },
     { value: "18-24", label: "18-24 years old" },
     { value: "25-29", label: "25-29 years old" },
     { value: "30-34", label: "30-34 years old" },
     { value: "35-39", label: "35-39 years old" },
-    { value: "40-49", label: "40-49 years old" },
-    { value: "50+", label: "50+ years old" }
+    { value: "40+", label: "40+ years old" }
   ];
 
   const handleContinue = () => {
