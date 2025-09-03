@@ -103,12 +103,45 @@ export default function EventDetailModal({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2">
               <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">About This Event</h3>
-                  <p className="text-gray-600" data-testid="text-event-detail-description">
-                    {event.description || "Join us for an amazing event experience!"}
-                  </p>
-                </div>
+                {/* Show hours for restaurants, description for events */}
+                {event.name === event.venue && categories.includes('food') ? (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Hours of Operation</h3>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="space-y-2 text-sm">
+                        {[
+                          { day: 'Monday', hours: '11:00 AM - 10:00 PM' },
+                          { day: 'Tuesday', hours: '11:00 AM - 10:00 PM' },
+                          { day: 'Wednesday', hours: '11:00 AM - 10:00 PM' },
+                          { day: 'Thursday', hours: '11:00 AM - 11:00 PM' },
+                          { day: 'Friday', hours: '11:00 AM - 12:00 AM' },
+                          { day: 'Saturday', hours: '10:00 AM - 12:00 AM' },
+                          { day: 'Sunday', hours: '10:00 AM - 9:00 PM' }
+                        ].map((schedule) => {
+                          const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+                          const isToday = schedule.day === today;
+                          return (
+                            <div 
+                              key={schedule.day} 
+                              className={`flex justify-between ${isToday ? 'font-semibold text-primary' : ''}`}
+                              data-testid={`hours-${schedule.day.toLowerCase()}`}
+                            >
+                              <span>{schedule.day}</span>
+                              <span>{schedule.hours}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">About This Event</h3>
+                    <p className="text-gray-600" data-testid="text-event-detail-description">
+                      {event.description || "Join us for an amazing event experience!"}
+                    </p>
+                  </div>
+                )}
 
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Event Categories</h3>
