@@ -210,16 +210,17 @@ export default function Home() {
         {searchQuery && (
           <div className="md:hidden mb-4">
             <div className="bg-white rounded-lg p-4 shadow-sm border">
-              <p className="text-sm text-gray-600">Current location:</p>
-              <p className="font-medium text-gray-900">{searchQuery}</p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setSearchQuery("")}
-                className="mt-2"
-              >
-                Change Location
-              </Button>
+              <p className="text-sm text-gray-600 mb-1">Current location:</p>
+              <div className="flex items-center justify-between">
+                <p className="font-medium text-gray-900">{searchQuery}</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setSearchQuery("")}
+                >
+                  Change Location
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -330,27 +331,20 @@ export default function Home() {
                     }
 
                     return (
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {recommendedEvents.map((event) => (
-                          <div key={event.id} className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-lg p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <span className="inline-block px-2 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full">
+                          <div key={event.id} className="relative">
+                            <div className="absolute top-3 left-3 z-10">
+                              <span className="inline-block px-3 py-1 text-xs font-medium bg-primary text-white rounded-full shadow-sm">
                                 Recommended
                               </span>
-                              <span className="text-sm font-medium text-gray-900">${event.price}</span>
                             </div>
-                            <h3 className="font-medium text-gray-900 mb-2">{event.name}</h3>
-                            <p className="text-sm text-gray-600 mb-2">{event.venue}</p>
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-gray-600">{event.startTime}</span>
-                              <Button
-                                size="sm"
-                                onClick={() => handleViewDetails(event)}
-                                data-testid={`button-view-recommended-${event.id}`}
-                              >
-                                View Details
-                              </Button>
-                            </div>
+                            <EventCard
+                              event={event}
+                              onAddToPlan={handleAddToPlan}
+                              onViewDetails={handleViewDetails}
+                              isInPlan={isInPlan(event.id)}
+                            />
                           </div>
                         ))}
                       </div>
