@@ -236,7 +236,7 @@ export default function EventDetailModal({
                           size="sm"
                           data-testid="button-ticket-ticketmaster"
                         >
-                          🎫 Ticketmaster
+                          Ticketmaster
                         </Button>
                       )}
                       {ticketLinks.stubhub && (
@@ -246,17 +246,17 @@ export default function EventDetailModal({
                           size="sm"
                           data-testid="button-ticket-stubhub"
                         >
-                          🎟️ StubHub
+                          StubHub
                         </Button>
                       )}
                       {ticketLinks.seatgeek && (
                         <Button
                           onClick={() => handleTicketClick('SeatGeek', ticketLinks.seatgeek)}
-                          className="w-full bg-green-600 text-white hover:bg-green-700 hover:shadow-lg transition-all duration-200 font-medium transform hover:scale-105"
+                          className="w-full bg-teal-600 text-white hover:bg-teal-700 hover:shadow-lg transition-all duration-200 font-medium transform hover:scale-105"
                           size="sm"
                           data-testid="button-ticket-seatgeek"
                         >
-                          🎪 SeatGeek
+                          SeatGeek
                         </Button>
                       )}
                     </div>
