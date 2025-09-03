@@ -183,6 +183,7 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
             onClick={() => onViewDetails(event)}
             variant="outline"
             size="sm"
+            className="flex items-center gap-1 border-2 border-yellow-400 text-yellow-700 bg-yellow-50 hover:bg-yellow-100 hover:border-yellow-500 hover:text-yellow-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
             data-testid={`button-view-details-${event.id}`}
           >
             Details
