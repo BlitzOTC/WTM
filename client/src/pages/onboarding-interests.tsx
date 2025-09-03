@@ -72,10 +72,8 @@ export default function OnboardingInterests() {
                   }`}
                   data-testid={`interest-option-${interest.value}`}
                 >
-                  <div className={`w-12 h-12 rounded-lg mx-auto mb-3 flex items-center justify-center ${
-                    isSelected ? "bg-primary/10" : interest.color
-                  }`}>
-                    <Icon className={`h-6 w-6 ${isSelected ? "text-primary" : ""}`} />
+                  <div className={`w-12 h-12 rounded-lg mx-auto mb-3 flex items-center justify-center ${interest.color}`}>
+                    <Icon className="h-6 w-6" />
                   </div>
                   <div className="text-sm font-medium">{interest.label}</div>
                   {isSelected && (
