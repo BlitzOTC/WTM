@@ -18,15 +18,15 @@ export default function OnboardingPreferences() {
   const priceRanges = [
     { value: "free", label: "Free events", description: "$0" },
     { value: "budget", label: "Budget-friendly", description: "$1 - $25" },
-    { value: "moderate", label: "Moderate", description: "$25 - $75" },
-    { value: "premium", label: "Premium", description: "$75+" }
+    { value: "moderate", label: "Moderate", description: "$25+" },
+    { value: "flexible", label: "Flexible", description: "Any price" }
   ];
 
   const groupSizes = [
     { value: "solo", label: "Solo adventures", description: "Just me" },
     { value: "small", label: "Small groups", description: "2-4 people" },
     { value: "medium", label: "Medium groups", description: "5-10 people" },
-    { value: "large", label: "Large groups", description: "10+ people" }
+    { value: "varies", label: "It varies", description: "Depends on mood" }
   ];
 
   const timePreferences = [
