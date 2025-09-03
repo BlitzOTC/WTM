@@ -4,15 +4,15 @@ import { Button } from "@/components/ui/button";
 
 export default function OnboardingPreferences() {
   const [selectedPreferences, setSelectedPreferences] = useState<{
-    priceRange: string;
-    groupSize: string;
-    timePreference: string;
-    distance: string;
+    priceRange: string[];
+    groupSize: string[];
+    timePreference: string[];
+    distance: string[];
   }>({
-    priceRange: "",
-    groupSize: "",
-    timePreference: "",
-    distance: ""
+    priceRange: [],
+    groupSize: [],
+    timePreference: [],
+    distance: []
   });
 
   const priceRanges = [
@@ -46,7 +46,9 @@ export default function OnboardingPreferences() {
   const handlePreferenceChange = (category: string, value: string) => {
     setSelectedPreferences(prev => ({
       ...prev,
-      [category]: value
+      [category]: prev[category as keyof typeof prev].includes(value)
+        ? prev[category as keyof typeof prev].filter(item => item !== value)
+        : [...prev[category as keyof typeof prev], value]
     }));
   };
 
@@ -67,7 +69,7 @@ export default function OnboardingPreferences() {
     window.location.href = '/';
   };
 
-  const allSelected = Object.values(selectedPreferences).every(value => value !== "");
+  const allSelected = Object.values(selectedPreferences).every(array => array.length > 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/20 via-secondary/10 to-background flex items-center justify-center p-4">
@@ -107,7 +109,7 @@ export default function OnboardingPreferences() {
                     key={range.value}
                     onClick={() => handlePreferenceChange('priceRange', range.value)}
                     className={`p-3 rounded-lg border text-left transition-all ${
-                      selectedPreferences.priceRange === range.value
+                      selectedPreferences.priceRange.includes(range.value)
                         ? "border-primary bg-primary/5 text-primary"
                         : "border-gray-200 hover:border-gray-300 text-gray-700"
                     }`}
@@ -132,7 +134,7 @@ export default function OnboardingPreferences() {
                     key={size.value}
                     onClick={() => handlePreferenceChange('groupSize', size.value)}
                     className={`p-3 rounded-lg border text-left transition-all ${
-                      selectedPreferences.groupSize === size.value
+                      selectedPreferences.groupSize.includes(size.value)
                         ? "border-primary bg-primary/5 text-primary"
                         : "border-gray-200 hover:border-gray-300 text-gray-700"
                     }`}
@@ -157,7 +159,7 @@ export default function OnboardingPreferences() {
                     key={time.value}
                     onClick={() => handlePreferenceChange('timePreference', time.value)}
                     className={`p-3 rounded-lg border text-left transition-all ${
-                      selectedPreferences.timePreference === time.value
+                      selectedPreferences.timePreference.includes(time.value)
                         ? "border-primary bg-primary/5 text-primary"
                         : "border-gray-200 hover:border-gray-300 text-gray-700"
                     }`}
@@ -182,7 +184,7 @@ export default function OnboardingPreferences() {
                     key={distance.value}
                     onClick={() => handlePreferenceChange('distance', distance.value)}
                     className={`p-3 rounded-lg border text-left transition-all ${
-                      selectedPreferences.distance === distance.value
+                      selectedPreferences.distance.includes(distance.value)
                         ? "border-primary bg-primary/5 text-primary"
                         : "border-gray-200 hover:border-gray-300 text-gray-700"
                     }`}
