@@ -13,7 +13,8 @@ interface EventCardProps {
 
 const categoryEmojis: Record<string, string> = {
   music: "🎵",
-  food: "🍽️",
+  fastfood: "🍟",
+  restaurant: "🍽️",
   drinks: "🍸",
   dancing: "💃",
   entertainment: "🎭",
@@ -22,7 +23,8 @@ const categoryEmojis: Record<string, string> = {
 
 const categoryLabels: Record<string, string> = {
   music: "Live Music",
-  food: "Food & Dining",
+  fastfood: "Fast Food",
+  restaurant: "Restaurant",
   drinks: "Cocktails",
   dancing: "Dancing",
   entertainment: "Entertainment",
@@ -67,7 +69,7 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
   const categories = Array.isArray(event.categories) ? event.categories : [];
   
   // Determine if this is a restaurant/bar without an event
-  const isRestaurantVenue = categories.includes('food') && event.name === event.venue;
+  const isRestaurantVenue = (categories.includes('fastfood') || categories.includes('restaurant')) && event.name === event.venue;
   const isBarVenue = (categories.includes('drinks') || categories.includes('dancing')) && event.name === event.venue;
   const isVenueOnly = isRestaurantVenue || isBarVenue;
   
