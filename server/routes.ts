@@ -9,17 +9,17 @@ import { EnhancedVenueEventGenerator } from "./real-events";
 // Generate location-specific events based on the search location
 function generateLocationBasedEvents(location: string): Event[] {
   const cityName = location.split(',')[0].trim();
-  const eventCategories = ['music', 'food', 'drinks', 'dancing', 'entertainment', 'sports'];
+  const eventCategories = ['music', 'fastfood', 'restaurant', 'drinks', 'dancing', 'entertainment', 'sports'];
   const ageRequirements = ['18', '21', 'all'];
   
   const venueTypes = [
     { type: 'bar', categories: ['drinks', 'music'] },
-    { type: 'restaurant', categories: ['food', 'drinks'] },
+    { type: 'restaurant', categories: ['restaurant', 'drinks'] },
     { type: 'club', categories: ['dancing', 'music'] },
     { type: 'theater', categories: ['entertainment'] },
-    { type: 'pub', categories: ['food', 'drinks', 'entertainment'] },
+    { type: 'pub', categories: ['restaurant', 'drinks', 'entertainment'] },
     { type: 'lounge', categories: ['drinks', 'music'] },
-    { type: 'cafe', categories: ['food'] },
+    { type: 'cafe', categories: ['fastfood'] },
     { type: 'arena', categories: ['sports', 'entertainment'] }
   ];
 

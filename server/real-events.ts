@@ -56,7 +56,8 @@ export class EnhancedVenueEventGenerator {
     'comedy': ['Stand-up Comedy Show', 'Comedy Open Mic', 'Improv Night', 'Comedy Special Taping'],
     'theater': ['Broadway Show', 'Play Performance', 'Musical Theater', 'Dance Performance'],
     'nightlife': ['Night Club Event', 'Rooftop Party', 'Happy Hour', 'Cocktail Class', 'Wine Tasting'],
-    'food': ['Restaurant Week', 'Chef\'s Table', 'Food Festival', 'Cooking Class', 'Pop-up Dining'],
+    'fastfood': ['Quick Bites', 'Lunch Special', 'Grab & Go', 'Express Menu', 'Fast Casual'],
+    'restaurant': ['Restaurant Week', 'Chef\'s Table', 'Food Festival', 'Cooking Class', 'Pop-up Dining'],
     'art': ['Art Gallery Opening', 'Museum Exhibition', 'Art Workshop', 'Artist Talk', 'Gallery Walk']
   };
 

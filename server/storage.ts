@@ -81,6 +81,7 @@ export class MemStorage implements IStorage {
         endTime: "02:00",
         price: 0, // Free
         ageRequirement: "18",
+        dressCode: null,
         categories: ["dancing", "music"],
         eventType: "venue",
         privacy: "public",
@@ -102,7 +103,8 @@ export class MemStorage implements IStorage {
         endTime: "23:30",
         price: 1500, // $15.00
         ageRequirement: "all",
-        categories: ["entertainment", "food"],
+        dressCode: null,
+        categories: ["entertainment", "restaurant"],
         eventType: "venue",
         privacy: "public",
         hostId: "venue3",
@@ -123,6 +125,7 @@ export class MemStorage implements IStorage {
         endTime: "01:00",
         price: 3500, // $35.00
         ageRequirement: "21",
+        dressCode: null,
         categories: ["music"],
         eventType: "venue",
         privacy: "public",
@@ -147,7 +150,8 @@ export class MemStorage implements IStorage {
         endTime: "21:30",
         price: 4500, // $45.00
         ageRequirement: "21",
-        categories: ["food", "drinks"],
+        dressCode: null,
+        categories: ["restaurant", "drinks"],
         eventType: "venue",
         privacy: "public",
         hostId: "venue5",
@@ -168,6 +172,7 @@ export class MemStorage implements IStorage {
         endTime: "22:00",
         price: 0, // Free
         ageRequirement: "all",
+        dressCode: null,
         categories: ["entertainment", "sports"],
         eventType: "venue",
         privacy: "public",
