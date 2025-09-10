@@ -180,7 +180,7 @@ export class EnhancedVenueEventGenerator {
       'nightlife': ['drinks', 'dancing', 'music'],
       'fastfood': ['fastfood', 'drinks'],
       'restaurant': ['restaurant', 'drinks'],
-      'art': ['entertainment']
+      'art': ['art']
     };
     
     return categoryMap[eventType] || ['entertainment'];

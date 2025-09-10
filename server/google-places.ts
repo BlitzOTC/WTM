@@ -321,7 +321,7 @@ export class GooglePlacesService {
     } else if (venueTypes.includes('museum') || venueTypes.includes('art_gallery')) {
       return {
         name: venueName, // Museum/Gallery name as main title
-        categories: ['entertainment'],
+        categories: ['art'],
         ageRequirement: 'all'
       };
     } else {

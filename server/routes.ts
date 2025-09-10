@@ -20,7 +20,9 @@ function generateLocationBasedEvents(location: string): Event[] {
     { type: 'pub', categories: ['restaurant', 'drinks', 'entertainment'] },
     { type: 'lounge', categories: ['drinks', 'music'] },
     { type: 'cafe', categories: ['fastfood'] },
-    { type: 'arena', categories: ['sports', 'entertainment'] }
+    { type: 'arena', categories: ['sports', 'entertainment'] },
+    { type: 'gallery', categories: ['art'] },
+    { type: 'museum', categories: ['art'] }
   ];
 
   const events: Event[] = [];
@@ -41,15 +43,20 @@ function generateLocationBasedEvents(location: string): Event[] {
       venue: `${getVenueName(venueType.type, cityName)}`,
       address: `${Math.floor(Math.random() * 999) + 100} ${getStreetName()} ${getStreetType()}`,
       city: cityName,
+      state: 'CA',
       startTime: timeString,
+      endTime: `${(eventStart.getHours() + 3) % 24}:${eventStart.getMinutes().toString().padStart(2, '0')}`,
       price: price,
-      categories: venueType.categories,
       ageRequirement: ageRequirements[Math.floor(Math.random() * ageRequirements.length)],
-      capacity: Math.floor(Math.random() * 200) + 50,
-      attendees: Math.floor(Math.random() * 150) + 10,
+      dressCode: null,
+      categories: venueType.categories,
+      eventType: 'venue',
+      privacy: 'public',
+      hostId: 'system',
+      maxCapacity: Math.floor(Math.random() * 200) + 50,
+      currentAttendees: Math.floor(Math.random() * 150) + 10,
       imageUrl: `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 100000000)}?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=240`,
-      ticketLinks: {},
-      rating: Math.floor(Math.random() * 20) + 35 / 10
+      ticketLinks: {}
     } as Event);
   }
   
@@ -65,7 +72,9 @@ function getEventName(venueType: string): string {
     pub: ['Trivia Night', 'Sports Viewing Party', 'Karaoke Night', 'Live Music'],
     lounge: ['Cocktail Hour', 'Smooth Jazz Evening', 'Wine & Cheese Night', 'Acoustic Session'],
     cafe: ['Open Mic Night', 'Poetry Reading', 'Art Exhibition', 'Coffee Cupping'],
-    arena: ['Concert', 'Sports Event', 'Festival', 'Live Show']
+    arena: ['Concert', 'Sports Event', 'Festival', 'Live Show'],
+    gallery: ['Art Gallery Opening', 'Contemporary Art Show', 'Photography Exhibition', 'Artist Showcase'],
+    museum: ['Cultural Exhibition', 'History Display', 'Interactive Experience', 'Educational Tour']
   };
   
   const names = eventNames[venueType] || ['Special Event'];
