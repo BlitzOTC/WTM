@@ -65,16 +65,16 @@ function generateLocationBasedEvents(location: string): Event[] {
 
 function getEventName(venueType: string): string {
   const eventNames: Record<string, string[]> = {
-    bar: ['Live Jazz Night', 'Craft Beer Tasting', 'Happy Hour Special', 'Local Band Showcase'],
-    restaurant: ['Wine Pairing Dinner', 'Chef\'s Special Menu', 'Culinary Experience', 'Farm-to-Table Night'],
-    club: ['DJ Night', 'Dance Party', 'Electronic Music Night', 'Theme Party'],
-    theater: ['Live Performance', 'Comedy Show', 'Musical Evening', 'Drama Night'],
-    pub: ['Trivia Night', 'Sports Viewing Party', 'Karaoke Night', 'Live Music'],
-    lounge: ['Cocktail Hour', 'Smooth Jazz Evening', 'Wine & Cheese Night', 'Acoustic Session'],
-    cafe: ['Open Mic Night', 'Poetry Reading', 'Art Exhibition', 'Coffee Cupping'],
-    arena: ['Concert', 'Sports Event', 'Festival', 'Live Show'],
-    gallery: ['Art Gallery Opening', 'Contemporary Art Show', 'Photography Exhibition', 'Artist Showcase'],
-    museum: ['Cultural Exhibition', 'History Display', 'Interactive Experience', 'Educational Tour']
+    bar: ['Happy Hour', 'Craft Beer Tasting', 'Mixology Class', 'Spirits Tasting', 'Wine Flight', 'Industry Night'],
+    restaurant: ['Chef\'s Tasting Menu', 'Wine Pairing Dinner', 'Guest Chef Takeover', 'Seasonal Menu', 'Cooking Class', 'Bottomless Brunch'],
+    club: ['DJ Night', '\'80s Night', '\'90s Night', 'Silent Disco', 'Foam Party', 'Dance Battle', 'Hip-Hop Night'],
+    theater: ['Theater Performance', 'Musical Theater', 'Comedy Show', 'Improv Show', 'Magic Show', 'Variety Show'],
+    pub: ['Trivia Night', 'Sports Watch Party', 'Karaoke Night', 'Pool Tournament', 'Darts Tournament', 'Poker Night'],
+    lounge: ['Happy Hour', 'Rooftop Bar Night', 'Jazz Night', 'Acoustic Set', 'Wine Tasting', 'Cocktail Menu Launch'],
+    cafe: ['Open Mic Night', 'Poetry Reading', 'BOGO Night', 'Late-Night Menu', 'Pop-up Kitchen', 'Limited-Time Menu'],
+    arena: ['Stadium Concert', 'Sports Watch Party', 'Music Festival', 'Esports Tournament', 'Boxing Match', 'UFC Night'],
+    gallery: ['Art Exhibition', 'Gallery Opening', 'Photography Show', 'Artist Talk', 'Art Workshop', 'Cultural Festival'],
+    museum: ['Museum Late Night', 'Curator Tour', 'History Tour', 'Art Workshop', 'Academic Lecture', 'Cultural Festival']
   };
   
   const names = eventNames[venueType] || ['Special Event'];

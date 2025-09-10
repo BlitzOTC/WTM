@@ -269,29 +269,51 @@ export class GooglePlacesService {
 
   private generateVenueListingDetails(venueTypes: string[], venueName: string) {
     const musicEvents = [
-      'Live Jazz Night', 'Acoustic Session', 'DJ Set', 'Open Mic Night', 'Live Band Performance',
-      'Karaoke Night', 'Blues Jam Session', 'Rock Concert', 'Electronic Music Night', 'Indie Music Showcase'
+      'Stadium Concert', 'Arena Show', 'Club Concert', 'Bar Live Music', 'Album Release Show',
+      'Local Band Showcase', 'Battle of the Bands', 'Tribute Night', 'Jazz Night', 'Blues Jam',
+      'Acoustic Set', 'Piano Bar Sing-Along', 'Open Mic Night', 'DJ Set', 'House Music Night',
+      'Techno Night', 'EDM Show', 'Hip-Hop Night', 'Music Festival', 'After-Party'
+    ];
+    
+    const fastfoodEvents = [
+      'Grand Opening', 'Soft Opening', 'Limited-Time Menu', 'Collaboration Drop',
+      'Late-Night Menu', 'BOGO Night', '2-for-1 Special', 'Food Truck Rally',
+      'Street Food Market', 'Night Market', 'Pop-up Kitchen', 'Value Menu Special'
     ];
     
     const restaurantEvents = [
-      'Wine Pairing Dinner', 'Chef\'s Tasting Menu', 'Date Night Special', 'Happy Hour',
-      'Brunch Experience', 'Cocktail Class', 'Food & Wine Festival', 'Live Cooking Demo',
-      'Seasonal Menu Launch', 'Chef\'s Table Experience'
+      'Chef\'s Tasting Menu', 'Omakase Seating', 'Wine Pairing Dinner', 'Beer Pairing',
+      'Guest Chef Takeover', 'Seasonal Menu', 'Holiday Menu', 'Valentine\'s Special',
+      'Bottomless Brunch', 'Supper Club', 'Cooking Class', 'Demo Dinner'
     ];
     
-    const comedyEvents = [
-      'Stand-Up Comedy Show', 'Comedy Open Mic', 'Improv Night', 'Comedy Showcase',
-      'Late Night Comedy', 'Comedy Special Taping', 'Roast Battle', 'Comedy Competition'
+    const drinksEvents = [
+      'Happy Hour', 'Late-Night Happy Hour', 'Industry Night', 'Mixology Class',
+      'Spirits Tasting', 'Wine Flight', 'Tap Takeover', 'Brewery Event',
+      'Cocktail Menu Launch', 'Guest Bartender', 'Rooftop Bar Night', 'Speakeasy Experience'
+    ];
+    
+    const dancingEvents = [
+      'DJ Night', '\'80s Night', '\'90s Night', 'Disco Night', 'Salsa Social',
+      'Swing Social', 'Line Dancing', 'Hip-Hop Night', 'Silent Disco',
+      'Day Party', 'Rooftop Party', 'Dance Battle', 'Foam Party'
+    ];
+    
+    const entertainmentEvents = [
+      'Stand-up Comedy', 'Improv Show', 'Karaoke Night', 'Trivia Night',
+      'Magic Show', 'Movie Screening', 'Arcade Night', 'Escape Room',
+      'Murder Mystery Dinner', 'Board Game Tournament', 'Game Show Night'
+    ];
+    
+    const sportsEvents = [
+      'Sports Watch Party', 'PPV Fight Night', 'Bowling Night', 'Pool Tournament',
+      'Axe Throwing', 'Esports Tournament', 'Poker Night', 'Fantasy Draft Party'
     ];
     
     const artEvents = [
-      'Art Gallery Opening', 'Artist Meet & Greet', 'Photography Exhibition', 'Sculpture Display',
-      'Contemporary Art Show', 'Local Artist Showcase', 'Art Walk', 'Creative Workshop'
-    ];
-    
-    const theaterEvents = [
-      'Live Theater Performance', 'Musical Theater', 'Drama Production', 'Comedy Play',
-      'One-Man Show', 'Shakespeare Performance', 'Original Production', 'Theater Workshop'
+      'Theater Performance', 'Opera Night', 'Symphony Concert', 'Art Exhibition',
+      'Gallery Opening', 'Poetry Slam', 'Author Talk', 'Cultural Festival',
+      'Art Workshop', 'History Tour', 'Drag Cabaret'
     ];
     
     // For venue listings, use the venue name directly
