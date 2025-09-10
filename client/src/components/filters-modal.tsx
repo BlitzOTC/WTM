@@ -35,7 +35,8 @@ const categories = [
   { id: 'drinks', label: '🍸 Bars & Cocktails' },
   { id: 'dancing', label: '💃 Dancing & Clubs' },
   { id: 'entertainment', label: '🎭 Entertainment' },
-  { id: 'sports', label: '⚽ Sports & Games' }
+  { id: 'sports', label: '⚽ Sports & Games' },
+  { id: 'art', label: '🎨 Arts & Culture' }
 ];
 
 const ageRequirements = [

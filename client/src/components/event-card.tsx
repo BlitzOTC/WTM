@@ -18,7 +18,8 @@ const categoryEmojis: Record<string, string> = {
   drinks: "🍸",
   dancing: "💃",
   entertainment: "🎭",
-  sports: "⚽"
+  sports: "⚽",
+  art: "🎨"
 };
 
 const categoryLabels: Record<string, string> = {
@@ -28,7 +29,8 @@ const categoryLabels: Record<string, string> = {
   drinks: "Cocktails",
   dancing: "Dancing",
   entertainment: "Entertainment",
-  sports: "Sports & Games"
+  sports: "Sports & Games",
+  art: "Arts & Culture"
 };
 
 export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan }: EventCardProps) {

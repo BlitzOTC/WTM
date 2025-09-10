@@ -12,7 +12,8 @@ export default function OnboardingInterests() {
     { value: "drinks", label: "Cocktails", icon: Wine, color: "bg-orange-100 text-orange-600 border-orange-200" },
     { value: "dancing", label: "Dancing", icon: Users, color: "bg-pink-100 text-pink-600 border-pink-200" },
     { value: "entertainment", label: "Entertainment", icon: Palette, color: "bg-blue-100 text-blue-600 border-blue-200" },
-    { value: "sports", label: "Sports & Games", icon: Trophy, color: "bg-green-100 text-green-600 border-green-200" }
+    { value: "sports", label: "Sports & Games", icon: Trophy, color: "bg-green-100 text-green-600 border-green-200" },
+    { value: "art", label: "Arts & Culture", icon: Palette, color: "bg-indigo-100 text-indigo-600 border-indigo-200" }
   ];
 
   const handleInterestToggle = (interest: string) => {
