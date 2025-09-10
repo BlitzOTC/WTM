@@ -29,11 +29,11 @@ const groupSizes = [
 ];
 
 const categories = [
+  { id: 'music', label: '🎵 Live Music' },
   { id: 'fastfood', label: '🍟 Fast Food' },
   { id: 'restaurant', label: '🍽️ Restaurant' },
-  { id: 'music', label: '🎵 Live Music' },
-  { id: 'drinks', label: '🍸 Bars & Cocktails' },
-  { id: 'dancing', label: '💃 Dancing & Clubs' },
+  { id: 'drinks', label: '🍸 Cocktails' },
+  { id: 'dancing', label: '💃 Dancing' },
   { id: 'entertainment', label: '🎭 Entertainment' },
   { id: 'sports', label: '⚽ Sports & Games' },
   { id: 'art', label: '🎨 Arts & Culture' }
