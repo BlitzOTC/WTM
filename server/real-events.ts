@@ -143,7 +143,8 @@ export class EnhancedVenueEventGenerator {
       'comedy': `Get ready to laugh until your sides hurt at ${venue}'s comedy night. Featuring talented comedians and special guests.`,
       'theater': `Immerse yourself in a captivating theatrical experience at ${venue}. A must-see performance that will leave you spellbound.`,
       'nightlife': `Dance the night away at ${venue}. Premium drinks, great music, and an atmosphere you won't forget.`,
-      'food': `Indulge in a culinary journey at ${venue}. Experience exceptional flavors and innovative cuisine.`,
+      'fastfood': `Quick and delicious dining at ${venue}. Perfect for a fast bite with friends.`,
+      'restaurant': `Indulge in a culinary journey at ${venue}. Experience exceptional flavors and innovative cuisine.`,
       'art': `Discover stunning artistic expressions at ${venue}. An inspiring collection that celebrates creativity and culture.`
     };
     
@@ -156,7 +157,8 @@ export class EnhancedVenueEventGenerator {
       'comedy': { min: 1500, max: 5000 },   // $15-50
       'theater': { min: 3000, max: 15000 }, // $30-150
       'nightlife': { min: 0, max: 3000 },   // Free-$30
-      'food': { min: 2000, max: 8000 },     // $20-80
+      'fastfood': { min: 800, max: 2500 },    // $8-25
+      'restaurant': { min: 2000, max: 8000 },  // $20-80
       'art': { min: 0, max: 2500 }          // Free-$25
     };
     
@@ -175,7 +177,8 @@ export class EnhancedVenueEventGenerator {
       'comedy': ['entertainment'],
       'theater': ['entertainment'],
       'nightlife': ['drinks', 'dancing', 'music'],
-      'food': ['food', 'drinks'],
+      'fastfood': ['fastfood', 'drinks'],
+      'restaurant': ['restaurant', 'drinks'],
       'art': ['entertainment']
     };
     

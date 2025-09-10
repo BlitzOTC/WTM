@@ -296,9 +296,14 @@ export class GooglePlacesService {
     
     // For venue listings, use the venue name directly
     if (venueTypes.includes('restaurant') || venueTypes.includes('meal_takeaway') || venueTypes.includes('food')) {
+      // Determine if it's fast food or restaurant based on name/type
+      const fastFoodKeywords = ['mcdonalds', 'burger king', 'kfc', 'taco bell', 'subway', 'pizza hut', 'dominos', 'wendys', 'chipotle', 'starbucks', 'dunkin', 'dairy queen', 'five guys', 'in-n-out', 'chick-fil-a', 'popeyes', 'arbys', 'sonic', 'jack in the box', 'del taco', 'panda express', 'qdoba', 'jimmy johns', 'panera'];
+      const venueLower = venueName.toLowerCase();
+      const isFastFood = fastFoodKeywords.some(keyword => venueLower.includes(keyword)) || venueTypes.includes('meal_takeaway');
+      
       return {
         name: venueName, // Restaurant name as main title
-        categories: ['food', 'drinks'],
+        categories: isFastFood ? ['fastfood', 'drinks'] : ['restaurant', 'drinks'],
         ageRequirement: 'all'
       };
     } else if (venueTypes.includes('night_club') || venueTypes.includes('bar')) {
@@ -332,7 +337,7 @@ export class GooglePlacesService {
     const links: Record<string, string> = {};
     
     // Check if this is a restaurant venue
-    const isRestaurant = categories.includes('food') || categories.includes('drinks');
+    const isRestaurant = categories.includes('fastfood') || categories.includes('restaurant');
     
     // For restaurants, add website URL for menu access
     if (isRestaurant) {
