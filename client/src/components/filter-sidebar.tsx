@@ -26,7 +26,8 @@ const groupSizes = [
 ];
 
 const categories = [
-  { id: 'food', label: '🍽️ Food & Dining' },
+  { id: 'fastfood', label: '🍟 Fast Food' },
+  { id: 'restaurant', label: '🍽️ Restaurant' },
   { id: 'music', label: '🎵 Live Music' },
   { id: 'drinks', label: '🍸 Bars & Cocktails' },
   { id: 'dancing', label: '💃 Dancing & Clubs' },
