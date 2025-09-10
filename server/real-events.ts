@@ -243,6 +243,17 @@ export class EnhancedVenueEventGenerator {
   private static generateTicketLinks(venue: string, eventType?: string): Record<string, string> {
     const links: Record<string, string> = {};
     
+    // Check if this is a restaurant venue based on name keywords
+    const restaurantKeywords = ['restaurant', 'bistro', 'cafe', 'grill', 'kitchen', 'eatery', 'dining', 'pizzeria', 'steakhouse'];
+    const isRestaurant = restaurantKeywords.some(keyword => venue.toLowerCase().includes(keyword));
+    
+    // For restaurants, add website URL for menu access
+    if (isRestaurant) {
+      const venueSlug = venue.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
+      links.website = `https://www.${venueSlug}.com`;
+      return links;
+    }
+    
     // Major venues typically have multiple ticket sources
     const majorVenues = ['Garden', 'Arena', 'Center', 'Bowl', 'Theater', 'Theatre'];
     const concertVenues = ['House of Blues', 'Blue Note', 'Whisky', 'Troubadour', 'Webster Hall'];

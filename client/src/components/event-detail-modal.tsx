@@ -228,6 +228,25 @@ export default function EventDetailModal({
                   {isInPlan ? 'In My Plan' : 'Add to My Plan'}
                 </Button>
                 
+                {/* Menu button for restaurants */}
+                {(event.name === event.venue && categories.includes('food')) && ticketLinks.website && (
+                  <Button
+                    onClick={() => {
+                      if (ticketLinks.website) {
+                        window.open(ticketLinks.website, '_blank');
+                      } else {
+                        const searchQuery = `${event.venue} menu`;
+                        window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
+                      }
+                    }}
+                    className="w-full bg-red-600 text-white hover:bg-red-700 hover:shadow-lg transition-all duration-200 font-medium transform hover:scale-105"
+                    size="sm"
+                    data-testid="button-restaurant-menu"
+                  >
+                    View Menu
+                  </Button>
+                )}
+
                 {(ticketLinks.ticketmaster || ticketLinks.stubhub || ticketLinks.seatgeek) && (
                   <>
                     <div className="text-center text-sm text-gray-500 mb-2">Get tickets from:</div>

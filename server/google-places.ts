@@ -249,15 +249,20 @@ export class GooglePlacesService {
         venue: venue.name, // Venue name should match for restaurants
         address: venue.vicinity || venue.formatted_address || '',
         city: city,
+        state: 'CA', // Default state
         startTime: timeString,
+        endTime: null,
         price: price,
-        categories: categories,
         ageRequirement: venueData.ageRequirement,
-        capacity: Math.floor(Math.random() * 200) + 50,
-        attendees: Math.floor(Math.random() * 150) + 10,
+        dressCode: null,
+        categories: categories,
+        eventType: 'venue',
+        privacy: 'public',
+        hostId: 'system',
+        maxCapacity: Math.floor(Math.random() * 200) + 50,
+        currentAttendees: Math.floor(Math.random() * 150) + 10,
         imageUrl: imageUrl,
-        ticketLinks: this.generateTicketLinks(venue.name, categories),
-        rating: venue.rating || Math.floor(Math.random() * 15) + 35 / 10
+        ticketLinks: this.generateTicketLinks(venue.name, categories)
       } as Event;
     });
   }
@@ -325,6 +330,16 @@ export class GooglePlacesService {
 
   private generateTicketLinks(venueName: string, categories: string[]): Record<string, string> {
     const links: Record<string, string> = {};
+    
+    // Check if this is a restaurant venue
+    const isRestaurant = categories.includes('food') || categories.includes('drinks');
+    
+    // For restaurants, add website URL for menu access
+    if (isRestaurant) {
+      const venueSlug = venueName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
+      links.website = `https://www.${venueSlug}.com`;
+      return links;
+    }
     
     // Major venues and entertainment venues typically have tickets
     const majorVenues = ['Garden', 'Arena', 'Center', 'Bowl', 'Theater', 'Theatre', 'Hall'];

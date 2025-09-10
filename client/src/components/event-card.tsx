@@ -170,17 +170,31 @@ export default function EventCard({ event, onAddToPlan, onViewDetails, isInPlan 
           {/* Right side - Menu and Tickets buttons */}
           <div className="flex space-x-2">
             {isRestaurantVenue && (
-              <Link to={`/menu/${event.id}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1 border-2 border-red-300 text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-400 hover:text-red-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
-                  data-testid={`button-menu-${event.id}`}
-                >
-                  <Menu className="h-4 w-4" />
-                  Menu
-                </Button>
-              </Link>
+              <Button
+                onClick={() => {
+                  const ticketLinks = typeof event.ticketLinks === 'object' && event.ticketLinks !== null 
+                    ? event.ticketLinks as Record<string, string>
+                    : {};
+                  
+                  // Check if restaurant has a website URL
+                  const websiteUrl = ticketLinks.website;
+                  
+                  if (websiteUrl) {
+                    window.open(websiteUrl, '_blank');
+                  } else {
+                    // Fallback to Google search for restaurant menu
+                    const searchQuery = `${event.venue} menu`;
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
+                  }
+                }}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 border-2 border-red-300 text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-400 hover:text-red-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                data-testid={`button-menu-${event.id}`}
+              >
+                <Menu className="h-4 w-4" />
+                Menu
+              </Button>
             )}
             {hasTickets && (
               <Button
