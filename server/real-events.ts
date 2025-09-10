@@ -52,13 +52,75 @@ export class EnhancedVenueEventGenerator {
   };
 
   private static realEventTypes: Record<string, string[]> = {
-    'concert': ['Live Music Performance', 'Album Release Party', 'Acoustic Set', 'DJ Set', 'Music Festival'],
-    'comedy': ['Stand-up Comedy Show', 'Comedy Open Mic', 'Improv Night', 'Comedy Special Taping'],
-    'theater': ['Broadway Show', 'Play Performance', 'Musical Theater', 'Dance Performance'],
-    'nightlife': ['Night Club Event', 'Rooftop Party', 'Happy Hour', 'Cocktail Class', 'Wine Tasting'],
-    'fastfood': ['Quick Bites', 'Lunch Special', 'Grab & Go', 'Express Menu', 'Fast Casual'],
-    'restaurant': ['Restaurant Week', 'Chef\'s Table', 'Food Festival', 'Cooking Class', 'Pop-up Dining'],
-    'art': ['Art Gallery Opening', 'Museum Exhibition', 'Art Workshop', 'Artist Talk', 'Gallery Walk']
+    'music': [
+      'Stadium Concert', 'Arena Show', 'Theater Performance', 'Club Concert', 'Bar Live Music',
+      'Album Release Show', 'Listening Party', 'Local Band Showcase', 'Battle of the Bands',
+      'Tribute Night', 'Cover Band Night', 'Jazz Night', 'Blues Jam', 'Funk Session',
+      'Acoustic Set', 'Singer-Songwriter Round', 'Piano Bar Sing-Along', 'Dueling Pianos',
+      'Open Mic Night', 'DJ Set', 'House Music Night', 'Techno Night', 'EDM Show',
+      'Hip-Hop Night', 'Music Festival', 'Multi-Stage Show', 'After-Party'
+    ],
+    'fastfood': [
+      'Grand Opening', 'Soft Opening', 'Limited-Time Menu', 'Collaboration Drop',
+      'Late-Night Menu', 'BOGO Night', '2-for-1 Special', 'Food Truck Rally',
+      'Street Food Market', 'Night Market', 'Pop-up Kitchen', 'Value Menu Special'
+    ],
+    'restaurant': [
+      'Chef\'s Tasting Menu', 'Omakase Seating', 'Wine Pairing Dinner', 'Beer Pairing',
+      'Whiskey Pairing', 'Guest Chef Takeover', 'Chef Collaboration', 'Seasonal Menu',
+      'Holiday Menu', 'Valentine\'s Special', 'Oktoberfest Menu', 'NYE Dinner',
+      'Bottomless Brunch', 'Brunch Party', 'Supper Club', 'Cooking Class', 'Demo Dinner'
+    ],
+    'drinks': [
+      'Happy Hour', 'Late-Night Happy Hour', 'Industry Night', 'Mixology Class',
+      'Cocktail Workshop', 'Spirits Tasting', 'Wine Flight', 'Whiskey Flight',
+      'Tap Takeover', 'Brewery Event', 'Distillery Event', 'Winery Event',
+      'Cocktail Menu Launch', 'Guest Bartender', 'Brand Pop-up', 'Bottle Share',
+      'Rare Release Party', 'Rooftop Bar Night', 'Speakeasy Experience'
+    ],
+    'dancing': [
+      'DJ Night', 'Guest DJ', 'Headliner Show', '\'80s Night', '\'90s Night',
+      '2000s Night', 'Emo Night', 'Disco Night', 'Salsa Social', 'Bachata Night',
+      'Merengue Night', 'Kizomba Social', 'Zouk Night', 'Swing Social',
+      'Ballroom Night', 'Tango Social', 'Line Dancing', 'Two-Step Night',
+      'Hip-Hop Night', 'R&B Night', 'Dancehall Night', 'Afrobeat Night',
+      'K-Pop Night', 'Silent Disco', 'Phone-Free Party', 'Day Party',
+      'Rooftop Party', 'Pool Party', 'Boat Cruise', 'Dance Battle',
+      'Cypher Night', 'Vogue Ball', 'Foam Party', 'UV Party', 'Paint Party'
+    ],
+    'entertainment': [
+      'Stand-up Comedy', 'Improv Show', 'Sketch Comedy', 'Karaoke Night',
+      'Private Room Karaoke', 'Trivia Night', 'Music Bingo', 'Themed Trivia',
+      'Classic Bingo', 'Drag Bingo', 'Magic Show', 'Mentalism Show',
+      'Variety Show', 'Cabaret', 'Burlesque Show', 'Movie Premiere',
+      'Film Screening', 'Movie Marathon', 'Sing-Along Movie', 'Outdoor Cinema',
+      'Rooftop Cinema', 'Drive-In Movie', 'Arcade Night', 'Barcade Tournament',
+      'High-Score Night', 'Escape Room', 'Murder Mystery Dinner',
+      'Immersive Theater', 'Board Game Tournament', 'Game Show Night'
+    ],
+    'sports': [
+      'Sports Watch Party', 'Jersey Night', 'PPV Fight Night', 'UFC Night',
+      'Boxing Match', 'Bowling Night', 'Cosmic Bowling', 'Pool Tournament',
+      'Darts Tournament', 'Shuffleboard', 'Cornhole Tournament', 'Axe Throwing',
+      'Mini Golf', 'TopGolf Night', 'Pickleball Tournament', 'Tennis Night',
+      'Table Tennis', 'Rec League Game', 'Laser Tag', 'Paintball', 'Go-Karts',
+      'Rock Climbing', 'Esports Tournament', 'LAN Party', 'Console Tournament',
+      'Smash Tournament', 'FIFA Tournament', 'VR Arena', 'VR Escape Room',
+      'Poker Night', 'Fantasy Draft Party', 'Trivia Tournament', 'Arcade Tournament'
+    ],
+    'art': [
+      'Theater Performance', 'Musical Theater', 'Staged Reading', 'Opera Night',
+      'Ballet Performance', 'Symphony Concert', 'Chamber Music', 'Dance Performance',
+      'Modern Dance', 'Contemporary Dance', 'Film Festival', 'Director Talk',
+      'Q&A Screening', 'Museum Late Night', 'Curator Tour', 'Art Exhibition',
+      'Gallery Opening', 'Art Walk', 'Artist Talk', 'Photography Show',
+      'Installation Art', 'Poetry Slam', 'Spoken Word', 'Storytelling Night',
+      'Author Talk', 'Book Launch', 'Book Signing', 'Cultural Festival',
+      'Heritage Festival', 'Lantern Parade', 'Fashion Show', 'Design Showcase',
+      'Craft Fair', 'Maker Market', 'Art Workshop', 'Painting Class',
+      'Pottery Class', 'Printmaking', 'Academic Lecture', 'Panel Discussion',
+      'History Tour', 'Architecture Tour', 'Ghost Tour', 'Drag Cabaret'
+    ]
   };
 
   static generateRealEvents(location: string): Event[] {
@@ -140,13 +202,14 @@ export class EnhancedVenueEventGenerator {
 
   private static generateEventDescription(eventType: string, venue: string, location: string): string {
     const descriptions: Record<string, string> = {
-      'concert': `Experience an unforgettable live music performance at ${venue}. Join us for an evening of incredible sounds and energy in the heart of ${location}.`,
-      'comedy': `Get ready to laugh until your sides hurt at ${venue}'s comedy night. Featuring talented comedians and special guests.`,
-      'theater': `Immerse yourself in a captivating theatrical experience at ${venue}. A must-see performance that will leave you spellbound.`,
-      'nightlife': `Dance the night away at ${venue}. Premium drinks, great music, and an atmosphere you won't forget.`,
-      'fastfood': `Quick and delicious dining at ${venue}. Perfect for a fast bite with friends.`,
-      'restaurant': `Indulge in a culinary journey at ${venue}. Experience exceptional flavors and innovative cuisine.`,
-      'art': `Discover stunning artistic expressions at ${venue}. An inspiring collection that celebrates creativity and culture.`
+      'music': `Experience live music at its finest at ${venue}. From intimate acoustic sets to high-energy performances, join us for an unforgettable night of music in ${location}.`,
+      'fastfood': `Quick, delicious, and convenient dining at ${venue}. Perfect for grabbing a bite on the go or late-night cravings in ${location}.`,
+      'restaurant': `Savor exceptional cuisine and dining experiences at ${venue}. From casual meals to fine dining, discover flavors that will delight your palate in ${location}.`,
+      'drinks': `Craft cocktails, premium spirits, and expertly curated drinks await at ${venue}. Join us for happy hour, tastings, or late-night libations in ${location}.`,
+      'dancing': `Move to the rhythm and dance the night away at ${venue}. From social dancing to club nights, experience the best dance scene ${location} has to offer.`,
+      'entertainment': `Laugh, play, and be entertained at ${venue}. From comedy shows to trivia nights, enjoy engaging entertainment in the heart of ${location}.`,
+      'sports': `Cheer, compete, and play at ${venue}. Whether watching the big game or joining the action, experience sports and games in ${location}.`,
+      'art': `Immerse yourself in creativity and culture at ${venue}. Discover inspiring art, performances, and cultural experiences in ${location}.`
     };
     
     return descriptions[eventType] || `Join us for an amazing experience at ${venue} in ${location}.`;
@@ -154,13 +217,14 @@ export class EnhancedVenueEventGenerator {
 
   private static generateRealisticPrice(eventType: string, venue: string): number {
     const priceRanges: Record<string, { min: number; max: number }> = {
-      'concert': { min: 2500, max: 12000 }, // $25-120
-      'comedy': { min: 1500, max: 5000 },   // $15-50
-      'theater': { min: 3000, max: 15000 }, // $30-150
-      'nightlife': { min: 0, max: 3000 },   // Free-$30
-      'fastfood': { min: 800, max: 2500 },    // $8-25
-      'restaurant': { min: 2000, max: 8000 },  // $20-80
-      'art': { min: 0, max: 2500 }          // Free-$25
+      'music': { min: 1500, max: 12000 },     // $15-120
+      'fastfood': { min: 500, max: 2500 },    // $5-25
+      'restaurant': { min: 2000, max: 15000 }, // $20-150
+      'drinks': { min: 0, max: 5000 },        // Free-$50
+      'dancing': { min: 0, max: 4000 },       // Free-$40
+      'entertainment': { min: 0, max: 4000 }, // Free-$40
+      'sports': { min: 0, max: 6000 },        // Free-$60
+      'art': { min: 0, max: 3000 }            // Free-$30
     };
     
     const range = priceRanges[eventType] || { min: 1000, max: 5000 };
