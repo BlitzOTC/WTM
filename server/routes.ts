@@ -259,9 +259,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           if (categories) {
             const categoryArray = typeof categories === 'string' ? [categories] : categories as string[];
-            filteredEvents = filteredEvents.filter(event => 
-              categoryArray.some(cat => event.categories.includes(cat))
-            );
+            filteredEvents = filteredEvents.filter(event => {
+              const eventCategories = Array.isArray(event.categories) ? event.categories : [];
+              return categoryArray.some(cat => eventCategories.includes(cat));
+            });
           }
           
           if (ageRequirement && ageRequirement !== 'all') {
