@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { type Event } from '@shared/schema';
 import EventCard from '@/components/event-card';
@@ -11,6 +12,10 @@ interface FeaturedEventsProps {
 }
 
 export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }: FeaturedEventsProps) {
+  const [page, setPage] = useState(1);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   // Get user's onboarding interests
   const getUserInterests = () => {
@@ -50,24 +55,82 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
 
   const userLocation = getUserLocation();
 
-  // Fetch featured events based on user interests
-  const { data: featuredEvents = [], isLoading } = useQuery<Event[]>({
-    queryKey: ['/api/events/featured', userInterests, userLocation],
+  // Fetch featured events with pagination
+  const { data: pageData, isLoading, isFetching } = useQuery<{events: Event[], hasMore: boolean}>({
+    queryKey: ['/api/events/featured', userInterests, userLocation, page],
     queryFn: async () => {
       if (userInterests.length === 0) {
-        return [];
+        return { events: [], hasMore: false };
       }
       
       const params = new URLSearchParams();
       params.append('interests', JSON.stringify(userInterests));
       params.append('location', userLocation);
+      params.append('page', page.toString());
+      params.append('limit', '12');
       
       const response = await fetch(`/api/events/featured?${params}`);
       if (!response.ok) throw new Error('Failed to fetch featured events');
-      return response.json();
+      const data = await response.json();
+      return {
+        events: data.events || data, // Handle both old and new response format
+        hasMore: data.hasMore ?? (data.events || data).length >= 12
+      };
     },
     enabled: userInterests.length > 0
   });
+  
+  // Update allEvents when new data arrives
+  useEffect(() => {
+    if (pageData) {
+      if (page === 1) {
+        setAllEvents(pageData.events);
+      } else {
+        // Dedupe by event ID to avoid duplicates
+        setAllEvents(prev => {
+          const existingIds = new Set(prev.map(e => e.id));
+          const newEvents = pageData.events.filter(e => !existingIds.has(e.id));
+          return [...prev, ...newEvents];
+        });
+      }
+      setHasMore(pageData.hasMore);
+      setIsLoadingMore(false);
+    }
+  }, [pageData, page]);
+  
+  // Load more events when intersection observer triggers
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loadMore = useCallback(() => {
+    if (!isFetching && hasMore && !isLoadingMore) {
+      setIsLoadingMore(true);
+      setPage(prev => prev + 1);
+    }
+  }, [isFetching, hasMore, isLoadingMore]);
+  
+  // Set up intersection observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+    
+    return () => observer.disconnect();
+  }, [loadMore, hasMore, isFetching]);
+  
+  // Reset pagination when interests or location change
+  useEffect(() => {
+    setPage(1);
+    setAllEvents([]);
+    setHasMore(true);
+  }, [userInterests, userLocation]);
 
   // Don't show anything if user hasn't completed onboarding
   if (userInterests.length === 0) {
@@ -87,11 +150,13 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-lg border border-gray-200 p-4">
-              <Skeleton className="h-32 w-full mb-3" />
-              <Skeleton className="h-5 w-3/4 mb-2" />
-              <Skeleton className="h-4 w-full mb-2" />
-              <Skeleton className="h-4 w-1/2" />
+            <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <Skeleton className="h-48 w-full" />
+              <div className="p-5">
+                <Skeleton className="h-5 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
             </div>
           ))}
         </div>
@@ -99,7 +164,7 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
     );
   }
 
-  if (featuredEvents.length === 0) {
+  if (allEvents.length === 0 && !isLoading) {
     return null;
   }
 
@@ -116,7 +181,7 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {featuredEvents.map((event) => (
+        {allEvents.map((event) => (
           <EventCard
             key={event.id}
             event={event}
@@ -126,7 +191,24 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
             data-testid={`card-featured-${event.id}`}
           />
         ))}
+        
+        {/* Loading more events */}
+        {isFetching && page > 1 && (
+          [...Array(3)].map((_, i) => (
+            <div key={`loading-${i}`} className="bg-white rounded-xl border border-gray-200 overflow-hidden animate-pulse">
+              <Skeleton className="h-48 w-full" />
+              <div className="p-5">
+                <Skeleton className="h-5 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            </div>
+          ))
+        )}
       </div>
+      
+      {/* Intersection observer target */}
+      <div ref={observerTarget} className="h-4 w-full" />
     </div>
   );
 }

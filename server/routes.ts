@@ -237,11 +237,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Featured events endpoint based on user interests
+  // Featured events endpoint based on user interests with pagination
   app.get('/api/events/featured', async (req, res) => {
     try {
       const interests = req.query.interests as string;
       const location = req.query.location as string;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 12;
       
       // Validate required parameters
       if (!interests) {
@@ -295,9 +297,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log('Google Places not available, using fallback events');
       }
       
-      // Always add some synthetic events to ensure variety
-      const syntheticEvents = generateLocationBasedEvents(location);
-      allEvents = [...allEvents, ...syntheticEvents];
+      // Always add synthetic events to ensure we have enough for pagination
+      // Generate multiple batches to have plenty of events
+      for (let batch = 0; batch < 5; batch++) {
+        const syntheticEvents = generateLocationBasedEvents(location);
+        // Add batch number to make events unique across batches
+        const batchEvents = syntheticEvents.map(event => ({
+          ...event,
+          id: `${event.id}-batch${batch}`,
+          name: batch > 0 ? `${event.name} (${batch + 1})` : event.name
+        }));
+        allEvents = [...allEvents, ...batchEvents];
+      }
       
       // Filter events based on user's interested categories
       const matchingEvents = allEvents.filter(event => {
@@ -321,27 +332,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return a.event.name.localeCompare(b.event.name);
       });
       
-      // Ensure variety across categories by selecting best from each category
+      // Ensure variety across categories by selecting best from each category, then fill with remaining
       const featuredEvents: Event[] = [];
       const usedCategories = new Set<string>();
       
-      // First pass: get one event from each user category
+      // First pass: get events from each user category to ensure variety
       for (const category of userCategories) {
-        const eventForCategory = rankedEvents.find(({ event }) => {
+        const eventsForCategory = rankedEvents.filter(({ event }) => {
           const eventCategories = Array.isArray(event.categories) ? event.categories : [];
           return eventCategories.includes(category) && 
                  !featuredEvents.some(fe => fe.id === event.id);
         });
         
-        if (eventForCategory && featuredEvents.length < 8) {
-          featuredEvents.push(eventForCategory.event);
-          usedCategories.add(category);
+        // Add up to 3 events per category to ensure variety
+        for (let i = 0; i < Math.min(3, eventsForCategory.length); i++) {
+          featuredEvents.push(eventsForCategory[i].event);
         }
+        usedCategories.add(category);
       }
       
-      // Second pass: fill remaining slots with best remaining events
+      // Second pass: fill with all remaining ranked events
       for (const { event } of rankedEvents) {
-        if (featuredEvents.length >= 8) break;
         if (!featuredEvents.some(fe => fe.id === event.id)) {
           featuredEvents.push(event);
         }
@@ -352,11 +363,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         index === self.findIndex(e => e.name === event.name && e.venue === event.venue)
       );
       
-      // Return up to 8 events
-      const finalEvents = uniqueEvents.slice(0, 8);
+      // Apply pagination
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedEvents = uniqueEvents.slice(startIndex, endIndex);
       
-      console.log(`Returning ${finalEvents.length} featured events for interests: ${interestsArray.join(', ')} in ${location}`);
-      res.json(finalEvents);
+      // Check if there are more events available
+      const hasMore = uniqueEvents.length > endIndex;
+      
+      console.log(`Returning ${paginatedEvents.length} featured events (page ${page}) for interests: ${interestsArray.join(', ')} in ${location}`);
+      res.json({
+        events: paginatedEvents,
+        hasMore: hasMore,
+        page: page,
+        totalCount: uniqueEvents.length
+      });
     } catch (error) {
       console.error('Error fetching featured events:', error);
       res.status(500).json({ error: 'Failed to fetch featured events' });
