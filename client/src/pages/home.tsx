@@ -6,6 +6,7 @@ import EventCard from "@/components/event-card";
 import NightPlan from "@/components/night-plan";
 import EventDetailModal from "@/components/event-detail-modal";
 import LocationSearch from "@/components/location-search";
+import FeaturedEvents from "@/components/featured-events";
 import { usePlan } from "@/hooks/use-plan";
 import { UserPlus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -246,18 +247,27 @@ export default function Home() {
           <main className="flex-1">
             {/* Show location search if no location is set */}
             {!searchQuery ? (
-              <div className="text-center py-16">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">Find Real Events Near You</h1>
-                <p className="text-gray-600 mb-8">Search for live events in any city using Google's real-time data</p>
-                <div className="max-w-md mx-auto">
-                  <LocationSearch
-                    onLocationSelect={(location) => {
-                      setSearchQuery(location);
-                    }}
-                    isLoading={isLoading}
-                  />
+              <>
+                <div className="text-center py-16">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-4">Find Real Events Near You</h1>
+                  <p className="text-gray-600 mb-8">Search for live events in any city using Google's real-time data</p>
+                  <div className="max-w-md mx-auto">
+                    <LocationSearch
+                      onLocationSelect={(location) => {
+                        setSearchQuery(location);
+                      }}
+                      isLoading={isLoading}
+                    />
+                  </div>
                 </div>
-              </div>
+                
+                {/* Featured Events Section - Show personalized events even without search */}
+                <FeaturedEvents
+                  onAddToPlan={handleAddToPlan}
+                  onViewDetails={handleViewDetails}
+                  isInPlan={(eventId) => isInPlan(eventId)}
+                />
+              </>
             ) : (
               <>
                 {/* Recommended Events Section */}

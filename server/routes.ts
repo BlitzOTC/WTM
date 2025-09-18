@@ -237,6 +237,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Featured events endpoint based on user interests
+  app.get('/api/events/featured', async (req, res) => {
+    try {
+      const interests = req.query.interests as string;
+      const location = req.query.location as string;
+      
+      // Validate required parameters
+      if (!interests) {
+        return res.status(400).json({ error: 'interests parameter is required' });
+      }
+      if (!location) {
+        return res.status(400).json({ error: 'location parameter is required' });
+      }
+
+      let interestsArray: string[];
+      try {
+        interestsArray = JSON.parse(interests) as string[];
+        if (!Array.isArray(interestsArray) || interestsArray.length === 0) {
+          return res.status(400).json({ error: 'interests must be a non-empty array' });
+        }
+      } catch (parseError) {
+        return res.status(400).json({ error: 'Invalid interests format - must be valid JSON array' });
+      }
+      
+      // Map onboarding interests to our event categories
+      const categoryMapping: Record<string, string[]> = {
+        'music': ['music'],
+        'food': ['fastfood', 'restaurant'],
+        'drinks': ['drinks'],
+        'sports': ['sports'],
+        'culture': ['art'],
+        'networking': ['entertainment'],
+        'gaming': ['sports', 'entertainment'],
+        'events': ['entertainment']
+      };
+
+      // Get categories based on user interests
+      const userCategories = interestsArray.flatMap(interest => categoryMapping[interest] || []);
+      
+      if (userCategories.length === 0) {
+        return res.status(400).json({ error: 'No valid categories found for provided interests' });
+      }
+      
+      // Generate a mix of events from different categories the user likes
+      let allEvents: Event[] = [];
+      
+      // Try Google Places first if we have real location data
+      try {
+        const googleApiKey = process.env.GOOGLE_API_KEY;
+        if (googleApiKey) {
+          const googlePlaces = new GooglePlacesService(googleApiKey);
+          const googleEvents = await googlePlaces.searchEvents(location);
+          allEvents = [...allEvents, ...googleEvents];
+        }
+      } catch (error) {
+        console.log('Google Places not available, using fallback events');
+      }
+      
+      // Always add some synthetic events to ensure variety
+      const syntheticEvents = generateLocationBasedEvents(location);
+      allEvents = [...allEvents, ...syntheticEvents];
+      
+      // Filter events based on user's interested categories
+      const matchingEvents = allEvents.filter(event => {
+        const eventCategories = Array.isArray(event.categories) ? event.categories : [];
+        return eventCategories.some(category => userCategories.includes(category));
+      });
+      
+      // Rank events by how many of user's categories they match
+      const rankedEvents = matchingEvents.map(event => {
+        const eventCategories = Array.isArray(event.categories) ? event.categories : [];
+        const matchCount = eventCategories.filter(category => userCategories.includes(category)).length;
+        return { event, matchCount };
+      });
+      
+      // Sort by match count (descending) and then by variety
+      rankedEvents.sort((a, b) => {
+        if (b.matchCount !== a.matchCount) {
+          return b.matchCount - a.matchCount;
+        }
+        // Secondary sort by name for consistency
+        return a.event.name.localeCompare(b.event.name);
+      });
+      
+      // Ensure variety across categories by selecting best from each category
+      const featuredEvents: Event[] = [];
+      const usedCategories = new Set<string>();
+      
+      // First pass: get one event from each user category
+      for (const category of userCategories) {
+        const eventForCategory = rankedEvents.find(({ event }) => {
+          const eventCategories = Array.isArray(event.categories) ? event.categories : [];
+          return eventCategories.includes(category) && 
+                 !featuredEvents.some(fe => fe.id === event.id);
+        });
+        
+        if (eventForCategory && featuredEvents.length < 8) {
+          featuredEvents.push(eventForCategory.event);
+          usedCategories.add(category);
+        }
+      }
+      
+      // Second pass: fill remaining slots with best remaining events
+      for (const { event } of rankedEvents) {
+        if (featuredEvents.length >= 8) break;
+        if (!featuredEvents.some(fe => fe.id === event.id)) {
+          featuredEvents.push(event);
+        }
+      }
+      
+      // Remove duplicates by venue and name
+      const uniqueEvents = featuredEvents.filter((event, index, self) => 
+        index === self.findIndex(e => e.name === event.name && e.venue === event.venue)
+      );
+      
+      // Return up to 8 events
+      const finalEvents = uniqueEvents.slice(0, 8);
+      
+      console.log(`Returning ${finalEvents.length} featured events for interests: ${interestsArray.join(', ')} in ${location}`);
+      res.json(finalEvents);
+    } catch (error) {
+      console.error('Error fetching featured events:', error);
+      res.status(500).json({ error: 'Failed to fetch featured events' });
+    }
+  });
+
   // Event routes
   app.get("/api/events", async (req, res) => {
     try {
