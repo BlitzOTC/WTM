@@ -261,10 +261,11 @@ export default function GroupView() {
                   </Button>
                 ) : (
                   <Button
-                    onClick={() => setLocation("/tonight")}
-                    variant="outline"
+                    onClick={() => setLocation(`/tonight?groupId=${groupId}`)}
+                    className="bg-primary text-white hover:bg-indigo-700 shadow-lg border-2 border-primary text-lg px-8 py-3 font-semibold"
                     data-testid="button-create-plan-first"
                   >
+                    <Plus className="h-5 w-5 mr-2" />
                     Create a Plan to Share
                   </Button>
                 )}
@@ -284,7 +285,7 @@ export default function GroupView() {
                         </div>
                         <div>
                           <div className="font-medium text-gray-900">
-                            {sharedPlan.user.username}'s Plan
+                            {sharedPlan.userId === CURRENT_USER_ID ? "Your Plan" : `${sharedPlan.user.username}'s Plan`}
                           </div>
                           <div className="text-sm text-gray-500">
                             Shared {new Date(sharedPlan.createdAt!).toLocaleDateString()}
