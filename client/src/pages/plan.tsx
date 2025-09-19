@@ -6,14 +6,20 @@ import { BookOpen, MapPin, Clock, DollarSign, ChevronDown, Play, Navigation, Che
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { usePlan } from "@/hooks/use-plan";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 
+const CURRENT_USER_ID = 'current-user-id'; // TODO: Get from auth context
+
 export default function Plan() {
-  const { events: selectedEvents, removeEvent, clearPlan } = usePlan();
+  const { events: selectedEvents, removeEvent, clearPlan, groupContext, setGroupContext } = usePlan();
   const [showPlanSummary, setShowPlanSummary] = useState(false);
   const [activeNightPlan, setActiveNightPlan] = useState<any>(null);
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [hasAutoShared, setHasAutoShared] = useState(false);
 
   // Calculate total cost
   const totalCost = selectedEvents.reduce((sum, event) => sum + event.price, 0);
@@ -59,6 +65,50 @@ export default function Plan() {
     // TODO: Implement route optimization
     console.log('Optimizing route for:', selectedEvents.length, 'events');
   };
+
+  // Auto-share plan to group if coming from group context
+  useEffect(() => {
+    const autoShareToGroup = async () => {
+      if (groupContext && selectedEvents.length > 0 && !hasAutoShared) {
+        try {
+          console.log('Auto-sharing plan to group:', groupContext);
+          
+          const planData = {
+            events: selectedEvents,
+            totalBudget: selectedEvents.reduce((sum, event) => sum + event.price, 0),
+            name: `My Night Plan - ${new Date().toLocaleDateString()}`
+          };
+
+          await apiRequest('POST', `/api/groups/${groupContext}/shared-plans`, {
+            userId: CURRENT_USER_ID,
+            planData
+          });
+          
+          // Invalidate the group's shared plans cache to show the new plan immediately
+          queryClient.invalidateQueries({ queryKey: [`/api/groups/${groupContext}/shared-plans`] });
+          
+          toast({
+            title: "Plan shared!",
+            description: "Your plan has been automatically shared with the group.",
+          });
+          
+          setHasAutoShared(true);
+          // Clear group context to avoid sharing again
+          setGroupContext(null);
+          
+        } catch (error) {
+          console.error('Failed to auto-share plan:', error);
+          toast({
+            title: "Failed to share plan",
+            description: "There was an error sharing your plan to the group.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    autoShareToGroup();
+  }, [selectedEvents, groupContext, hasAutoShared, setGroupContext, toast]);
 
   // Check for active night plan on component mount and periodically
   useEffect(() => {

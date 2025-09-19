@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { type Event } from "@shared/schema";
 import EventCard from "@/components/event-card";
@@ -23,8 +23,21 @@ interface Filters {
 }
 
 export default function Tonight() {
-  const { addEvent, isInPlan } = usePlan();
+  const { addEvent, isInPlan, setGroupContext } = usePlan();
   const [searchQuery, setSearchQuery] = useState("San Francisco, CA");
+
+  // Extract groupId from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const groupId = urlParams.get('groupId');
+
+  // Set group context when component mounts if coming from a group
+  useEffect(() => {
+    if (groupId) {
+      setGroupContext(groupId);
+      console.log('Set group context:', groupId);
+    }
+  }, [groupId, setGroupContext]);
+
 
   const handleLocationSelect = (location: string) => {
     setSearchQuery(location);

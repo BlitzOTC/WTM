@@ -4,6 +4,7 @@ import { type Event } from "@shared/schema";
 class PlanStore {
   private events: Event[] = [];
   private listeners: (() => void)[] = [];
+  private groupContext: string | null = null;
 
   addEvent(event: Event) {
     if (!this.events.find(e => e.id === event.id)) {
@@ -27,7 +28,17 @@ class PlanStore {
 
   clearPlan() {
     this.events = [];
+    this.groupContext = null;
     this.notifyListeners();
+  }
+
+  setGroupContext(groupId: string | null) {
+    this.groupContext = groupId;
+    this.notifyListeners();
+  }
+
+  getGroupContext(): string | null {
+    return this.groupContext;
   }
 
   subscribe(listener: () => void) {
