@@ -173,35 +173,23 @@ export default function GroupView() {
               <h1 className="text-xl font-bold text-gray-900" data-testid="text-group-name">
                 {group.name}
               </h1>
-              <p className="text-gray-600">
-                {members.length} member{members.length !== 1 ? 's' : ''}
+              <p className="text-gray-600 text-center">
+                {members.length} member{members.length !== 1 ? 's' : ''} • {sharedPlans.length} plan{sharedPlans.length !== 1 ? 's' : ''}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            {currentPlanEvents.length > 0 && (
-              <Button
-                onClick={handleShareCurrentPlan}
-                size="sm"
-                className="bg-primary text-white hover:bg-indigo-700"
-                data-testid="button-share-plan"
-              >
-                <Share2 className="h-4 w-4 mr-2" />
-                Share Plan
-              </Button>
-            )}
+          {currentPlanEvents.length > 0 && (
             <Button
-              onClick={handleLeaveGroup}
-              variant="outline"
+              onClick={handleShareCurrentPlan}
               size="sm"
-              className="bg-red-50 border-red-200 text-red-600 hover:bg-red-100 hover:border-red-300"
-              data-testid="button-leave-group"
+              className="bg-primary text-white hover:bg-indigo-700"
+              data-testid="button-share-plan"
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Leave Group
+              <Share2 className="h-4 w-4 mr-2" />
+              Share Plan
             </Button>
-          </div>
+          )}
         </div>
 
         {/* Group Description */}
@@ -363,6 +351,19 @@ export default function GroupView() {
               ))}
             </div>
           )}
+          
+          {/* Leave Group Button */}
+          <div className="mt-6 text-center">
+            <Button
+              onClick={handleLeaveGroup}
+              variant="outline"
+              className="bg-red-50 border-red-200 text-red-600 hover:bg-red-100 hover:border-red-300"
+              data-testid="button-leave-group"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Leave Group
+            </Button>
+          </div>
         </div>
       </div>
     </div>

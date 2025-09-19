@@ -18,6 +18,50 @@ export default function Groups() {
     queryKey: [`/api/users/${CURRENT_USER_ID}/groups`],
   });
 
+  // Fetch member counts for each group
+  const { data: groupMemberCounts = {} } = useQuery<Record<string, number>>({
+    queryKey: [`/api/users/${CURRENT_USER_ID}/group-member-counts`],
+    enabled: groups.length > 0,
+    queryFn: async () => {
+      const counts: Record<string, number> = {};
+      for (const group of groups) {
+        try {
+          const response = await fetch(`/api/groups/${group.id}/members`);
+          if (response.ok) {
+            const members = await response.json();
+            counts[group.id] = members.length;
+          }
+        } catch (error) {
+          console.error(`Failed to fetch members for group ${group.id}:`, error);
+          counts[group.id] = 0;
+        }
+      }
+      return counts;
+    },
+  });
+
+  // Fetch shared plan counts for each group
+  const { data: groupPlanCounts = {} } = useQuery<Record<string, number>>({
+    queryKey: [`/api/users/${CURRENT_USER_ID}/group-plan-counts`],
+    enabled: groups.length > 0,
+    queryFn: async () => {
+      const counts: Record<string, number> = {};
+      for (const group of groups) {
+        try {
+          const response = await fetch(`/api/groups/${group.id}/shared-plans`);
+          if (response.ok) {
+            const plans = await response.json();
+            counts[group.id] = plans.length;
+          }
+        } catch (error) {
+          console.error(`Failed to fetch plans for group ${group.id}:`, error);
+          counts[group.id] = 0;
+        }
+      }
+      return counts;
+    },
+  });
+
   const handleViewGroup = (groupId: string) => {
     setLocation(`/group/${groupId}`);
   };
@@ -117,14 +161,14 @@ export default function Groups() {
                   )}
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                  <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
                     <div className="flex items-center space-x-1">
                       <Users className="h-4 w-4" />
-                      <span>5 members</span> {/* TODO: Get actual member count */}
+                      <span>{groupMemberCounts[group.id] || 0} member{(groupMemberCounts[group.id] || 0) !== 1 ? 's' : ''}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
-                      <span>3 plans</span> {/* TODO: Get actual plan count */}
+                      <span>{groupPlanCounts[group.id] || 0} plan{(groupPlanCounts[group.id] || 0) !== 1 ? 's' : ''}</span>
                     </div>
                   </div>
                 </CardContent>
