@@ -266,10 +266,19 @@ export default function Home() {
                   onAddToPlan={handleAddToPlan}
                   onViewDetails={handleViewDetails}
                   isInPlan={(eventId) => isInPlan(eventId)}
+                  currentLocation="New York, NY"
                 />
               </>
             ) : (
               <>
+                {/* Featured Events Section - Show at top of search results */}
+                <FeaturedEvents
+                  onAddToPlan={handleAddToPlan}
+                  onViewDetails={handleViewDetails}
+                  isInPlan={(eventId) => isInPlan(eventId)}
+                  currentLocation={searchQuery}
+                />
+                
                 {/* Recommended Events Section */}
                 <div className="mb-8">
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Recommended Events</h2>

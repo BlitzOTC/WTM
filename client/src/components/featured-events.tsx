@@ -9,9 +9,10 @@ interface FeaturedEventsProps {
   onAddToPlan: (event: Event) => void;
   onViewDetails: (event: Event) => void;
   isInPlan: (eventId: string) => boolean;
+  currentLocation?: string;
 }
 
-export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }: FeaturedEventsProps) {
+export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan, currentLocation }: FeaturedEventsProps) {
   const [page, setPage] = useState(1);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -38,36 +39,49 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
   };
 
   const userInterests = getUserInterests();
+  const hasOnboarding = userInterests.length > 0;
 
   // Get user's location preference
   const getUserLocation = () => {
+    // Use current location from search query first
+    if (currentLocation) {
+      return currentLocation;
+    }
+    
+    // Try to get from onboarding data
     try {
       const onboardingData = localStorage.getItem('onboarding_data');
       if (onboardingData) {
         const preferences = JSON.parse(onboardingData);
-        return preferences.location || 'San Francisco, CA';
+        if (preferences.location) {
+          return preferences.location;
+        }
       }
     } catch (error) {
       console.error('Error getting user location:', error);
     }
-    return 'San Francisco, CA';
+    
+    // Default to New York as fallback
+    return 'New York, NY';
   };
 
   const userLocation = getUserLocation();
 
   // Fetch featured events with pagination
   const { data: pageData, isLoading, isFetching } = useQuery<{events: Event[], hasMore: boolean}>({
-    queryKey: ['/api/events/featured', userInterests, userLocation, page],
+    queryKey: ['/api/events/featured', userInterests, userLocation, page, hasOnboarding],
     queryFn: async () => {
-      if (userInterests.length === 0) {
-        return { events: [], hasMore: false };
-      }
-      
       const params = new URLSearchParams();
-      params.append('interests', JSON.stringify(userInterests));
+      
+      // Always include location
       params.append('location', userLocation);
       params.append('page', page.toString());
       params.append('limit', '12');
+      
+      // Only include interests if user has completed onboarding
+      if (hasOnboarding) {
+        params.append('interests', JSON.stringify(userInterests));
+      }
       
       const response = await fetch(`/api/events/featured?${params}`);
       if (!response.ok) throw new Error('Failed to fetch featured events');
@@ -77,7 +91,7 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
         hasMore: data.hasMore ?? (data.events || data).length >= 12
       };
     },
-    enabled: userInterests.length > 0
+    enabled: true // Always enable, show popular events if no onboarding
   });
   
   // Update allEvents when new data arrives
@@ -132,10 +146,7 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
     setHasMore(true);
   }, [userInterests, userLocation]);
 
-  // Don't show anything if user hasn't completed onboarding
-  if (userInterests.length === 0) {
-    return null;
-  }
+  // Always show Featured Events section
 
 
   if (isLoading) {
@@ -144,8 +155,8 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
         <div className="flex items-center gap-2 mb-4">
           <Star className="h-5 w-5 text-yellow-500" />
           <div>
-            <h2 className="text-xl font-semibold">Featured For You</h2>
-            <p className="text-sm text-gray-600">Based on your interests</p>
+            <h2 className="text-xl font-semibold">{hasOnboarding ? 'Featured For You' : 'Popular Events'}</h2>
+            <p className="text-sm text-gray-600">{hasOnboarding ? 'Based on your interests' : 'Most popular events in your area'}</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -165,7 +176,23 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
   }
 
   if (allEvents.length === 0 && !isLoading) {
-    return null;
+    return (
+      <div className="mb-8" data-testid="section-featured-events">
+        <div className="flex items-center gap-2 mb-4">
+          <Star className="h-5 w-5 text-yellow-500" />
+          <div>
+            <h2 className="text-xl font-semibold" data-testid="text-featured-title">
+              {hasOnboarding ? 'Featured For You' : 'Popular Events'}
+            </h2>
+            <p className="text-sm text-gray-600">{hasOnboarding ? 'Based on your interests' : 'Most popular events in your area'}</p>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+          <p className="text-gray-600 mb-2">No events found in your area</p>
+          <p className="text-sm text-gray-500">Try searching for events in a different location</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -174,9 +201,9 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan }:
         <Star className="h-5 w-5 text-yellow-500" />
         <div>
           <h2 className="text-xl font-semibold" data-testid="text-featured-title">
-            Featured For You
+            {hasOnboarding ? 'Featured For You' : 'Popular Events'}
           </h2>
-          <p className="text-sm text-gray-600">Based on your interests</p>
+          <p className="text-sm text-gray-600">{hasOnboarding ? 'Based on your interests' : 'Most popular events in your area'}</p>
         </div>
       </div>
 

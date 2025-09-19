@@ -237,7 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Featured events endpoint based on user interests with pagination
+  // Featured events endpoint - personalized with interests or popular events without
   app.get('/api/events/featured', async (req, res) => {
     try {
       const interests = req.query.interests as string;
@@ -245,22 +245,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 12;
       
-      // Validate required parameters
-      if (!interests) {
-        return res.status(400).json({ error: 'interests parameter is required' });
-      }
+      // Location is required
       if (!location) {
         return res.status(400).json({ error: 'location parameter is required' });
       }
 
-      let interestsArray: string[];
-      try {
-        interestsArray = JSON.parse(interests) as string[];
-        if (!Array.isArray(interestsArray) || interestsArray.length === 0) {
-          return res.status(400).json({ error: 'interests must be a non-empty array' });
+      let interestsArray: string[] = [];
+      let hasPersonalization = false;
+      
+      // Parse interests if provided (for personalized results)
+      if (interests) {
+        try {
+          interestsArray = JSON.parse(interests) as string[];
+          if (Array.isArray(interestsArray) && interestsArray.length > 0) {
+            hasPersonalization = true;
+          }
+        } catch (parseError) {
+          console.log('Invalid interests format, showing popular events instead');
         }
-      } catch (parseError) {
-        return res.status(400).json({ error: 'Invalid interests format - must be valid JSON array' });
       }
       
       // Map onboarding interests to our event categories
@@ -275,12 +277,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'events': ['entertainment']
       };
 
-      // Get categories based on user interests
-      const userCategories = interestsArray.flatMap(interest => categoryMapping[interest] || []);
-      
-      if (userCategories.length === 0) {
-        return res.status(400).json({ error: 'No valid categories found for provided interests' });
-      }
+      // Get categories based on user interests (if any)
+      const userCategories = hasPersonalization ? 
+        interestsArray.flatMap(interest => categoryMapping[interest] || []) : 
+        ['music', 'restaurant', 'drinks', 'entertainment', 'art']; // Default popular categories
       
       // Generate a mix of events from different categories the user likes
       let allEvents: Event[] = [];
@@ -310,27 +310,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         allEvents = [...allEvents, ...batchEvents];
       }
       
-      // Filter events based on user's interested categories
-      const matchingEvents = allEvents.filter(event => {
-        const eventCategories = Array.isArray(event.categories) ? event.categories : [];
-        return eventCategories.some(category => userCategories.includes(category));
-      });
+      // Filter and rank events based on personalization or popularity
+      let rankedEvents;
       
-      // Rank events by how many of user's categories they match
-      const rankedEvents = matchingEvents.map(event => {
-        const eventCategories = Array.isArray(event.categories) ? event.categories : [];
-        const matchCount = eventCategories.filter(category => userCategories.includes(category)).length;
-        return { event, matchCount };
-      });
-      
-      // Sort by match count (descending) and then by variety
-      rankedEvents.sort((a, b) => {
-        if (b.matchCount !== a.matchCount) {
-          return b.matchCount - a.matchCount;
-        }
-        // Secondary sort by name for consistency
-        return a.event.name.localeCompare(b.event.name);
-      });
+      if (hasPersonalization) {
+        // Filter events based on user's interested categories
+        const matchingEvents = allEvents.filter(event => {
+          const eventCategories = Array.isArray(event.categories) ? event.categories : [];
+          return eventCategories.some(category => userCategories.includes(category));
+        });
+        
+        // Rank events by how many of user's categories they match
+        rankedEvents = matchingEvents.map(event => {
+          const eventCategories = Array.isArray(event.categories) ? event.categories : [];
+          const matchCount = eventCategories.filter(category => userCategories.includes(category)).length;
+          return { event, matchCount };
+        });
+        
+        // Sort by match count (descending) and then by variety
+        rankedEvents.sort((a, b) => {
+          if (b.matchCount !== a.matchCount) {
+            return b.matchCount - a.matchCount;
+          }
+          return a.event.name.localeCompare(b.event.name);
+        });
+      } else {
+        // Show popular events - mix of different categories, sorted by variety
+        const popularEvents = allEvents.filter(event => {
+          const eventCategories = Array.isArray(event.categories) ? event.categories : [];
+          return eventCategories.some(category => userCategories.includes(category));
+        });
+        
+        // Rank by category diversity and randomize within groups for variety
+        rankedEvents = popularEvents.map(event => ({
+          event,
+          matchCount: Math.random() // Random for popular events to ensure variety
+        }));
+        
+        // Sort randomly but ensure category variety
+        rankedEvents.sort(() => Math.random() - 0.5);
+      }
       
       // Ensure variety across categories by selecting best from each category, then fill with remaining
       const featuredEvents: Event[] = [];
@@ -371,12 +390,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if there are more events available
       const hasMore = uniqueEvents.length > endIndex;
       
-      console.log(`Returning ${paginatedEvents.length} featured events (page ${page}) for interests: ${interestsArray.join(', ')} in ${location}`);
+      const eventType = hasPersonalization ? 'personalized' : 'popular';
+      console.log(`Returning ${paginatedEvents.length} ${eventType} events (page ${page}) in ${location}`);
       res.json({
         events: paginatedEvents,
         hasMore: hasMore,
         page: page,
-        totalCount: uniqueEvents.length
+        totalCount: uniqueEvents.length,
+        isPersonalized: hasPersonalization
       });
     } catch (error) {
       console.error('Error fetching featured events:', error);
