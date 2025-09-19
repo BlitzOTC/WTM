@@ -138,7 +138,7 @@ export default function Plan() {
 
             {/* Create Group button on the right */}
             <Button 
-              onClick={() => setLocation('/create-group')}
+              onClick={() => setLocation('/groups')}
               className="bg-primary text-white hover:bg-indigo-700"
               data-testid="button-create-group"
             >
