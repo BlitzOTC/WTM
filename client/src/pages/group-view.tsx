@@ -3,7 +3,7 @@ import { useLocation, useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Users, Plus, Calendar, Clock, DollarSign, Share2, Trash2 } from "lucide-react";
+import { ArrowLeft, Users, Plus, Calendar, Clock, DollarSign, Share2, Trash2, LogOut } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { type Group, type SharedPlan, type User, type Event } from "@shared/schema";
 import { usePlan } from "@/hooks/use-plan";
@@ -94,6 +94,27 @@ export default function GroupView() {
     }
   };
 
+  const handleLeaveGroup = async () => {
+    try {
+      await apiRequest("DELETE", `/api/groups/${groupId}/members/${CURRENT_USER_ID}`);
+      
+      toast({
+        title: "Left group",
+        description: "You have left the group.",
+      });
+
+      // Navigate back to groups page
+      setLocation("/groups");
+    } catch (error) {
+      toast({
+        title: "Failed to leave group",
+        description: "There was an error leaving the group. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error leaving group:", error);
+    }
+  };
+
   const formatTotalCost = (cost: number) => {
     if (cost === 0) return "FREE";
     return `$${(cost / 100).toFixed(0)}`;
@@ -158,17 +179,29 @@ export default function GroupView() {
             </div>
           </div>
 
-          {currentPlanEvents.length > 0 && (
+          <div className="flex items-center space-x-2">
+            {currentPlanEvents.length > 0 && (
+              <Button
+                onClick={handleShareCurrentPlan}
+                size="sm"
+                className="bg-primary text-white hover:bg-indigo-700"
+                data-testid="button-share-plan"
+              >
+                <Share2 className="h-4 w-4 mr-2" />
+                Share Plan
+              </Button>
+            )}
             <Button
-              onClick={handleShareCurrentPlan}
+              onClick={handleLeaveGroup}
+              variant="outline"
               size="sm"
-              className="bg-primary text-white hover:bg-indigo-700"
-              data-testid="button-share-plan"
+              className="bg-red-50 border-red-200 text-red-600 hover:bg-red-100 hover:border-red-300"
+              data-testid="button-leave-group"
             >
-              <Share2 className="h-4 w-4 mr-2" />
-              Share Plan
+              <LogOut className="h-4 w-4 mr-2" />
+              Leave Group
             </Button>
-          )}
+          </div>
         </div>
 
         {/* Group Description */}
