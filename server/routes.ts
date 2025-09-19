@@ -624,6 +624,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/groups/:id", async (req, res) => {
     try {
+      const currentUserId = getCurrentUserId();
+      const group = await storage.getGroup(req.params.id);
+      if (!group) {
+        return res.status(404).json({ message: "Group not found" });
+      }
+      
+      // Only allow group creator to delete the entire group
+      if (group.createdBy !== currentUserId) {
+        return res.status(403).json({ message: "Only group creator can delete the group" });
+      }
+      
       const success = await storage.deleteGroup(req.params.id);
       if (!success) {
         return res.status(404).json({ message: "Group not found" });
@@ -631,6 +642,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete group" });
+    }
+  });
+
+  // Leave group endpoint
+  app.delete("/api/groups/:groupId/members/:userId", async (req, res) => {
+    try {
+      const currentUserId = getCurrentUserId();
+      const { groupId, userId } = req.params;
+      
+      // Users can only leave themselves from groups
+      if (userId !== currentUserId) {
+        return res.status(403).json({ message: "You can only leave groups for yourself" });
+      }
+      
+      const success = await storage.leaveGroup(groupId, userId);
+      if (!success) {
+        return res.status(404).json({ message: "User not found in group" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to leave group" });
     }
   });
 

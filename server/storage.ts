@@ -31,6 +31,7 @@ export interface IStorage {
   getGroup(id: string): Promise<Group | undefined>;
   getUserGroups(userId: string): Promise<Group[]>;
   createGroup(group: InsertGroup): Promise<Group>;
+  leaveGroup(groupId: string, userId: string): Promise<boolean>;
   deleteGroup(id: string): Promise<boolean>;
 
   // Group membership methods
@@ -385,10 +386,31 @@ export class MemStorage implements IStorage {
     return group;
   }
 
+  async leaveGroup(groupId: string, userId: string): Promise<boolean> {
+    // Find and remove the user's membership
+    const membership = Array.from(this.groupMemberships.values())
+      .find(m => m.groupId === groupId && m.userId === userId);
+    
+    if (!membership) {
+      return false; // User not in group
+    }
+    
+    this.groupMemberships.delete(membership.id);
+    
+    // Remove user's shared plans from this group
+    const userSharedPlans = Array.from(this.sharedPlans.values())
+      .filter(plan => plan.groupId === groupId && plan.userId === userId);
+    userSharedPlans.forEach(plan => this.sharedPlans.delete(plan.id));
+    
+    return true;
+  }
+
   async deleteGroup(id: string): Promise<boolean> {
-    // Remove all memberships
+    // Only delete if no members remain or if explicitly called by group creator
     const memberships = Array.from(this.groupMemberships.values())
       .filter(membership => membership.groupId === id);
+    
+    // Remove all memberships
     memberships.forEach(membership => this.groupMemberships.delete(membership.id));
     
     // Remove all shared plans
