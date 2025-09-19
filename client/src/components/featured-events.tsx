@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { type Event } from '@shared/schema';
 import EventCard from '@/components/event-card';
@@ -38,11 +38,12 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan, c
     return [];
   };
 
-  const userInterests = getUserInterests();
+  // Memoize user interests to prevent infinite re-renders
+  const userInterests = useMemo(() => getUserInterests(), []);
   const hasOnboarding = userInterests.length > 0;
 
-  // Get user's location preference
-  const getUserLocation = () => {
+  // Memoize user location to prevent infinite re-renders
+  const userLocation = useMemo(() => {
     // Use current location from search query first
     if (currentLocation) {
       return currentLocation;
@@ -63,9 +64,7 @@ export default function FeaturedEvents({ onAddToPlan, onViewDetails, isInPlan, c
     
     // Default to New York as fallback
     return 'New York, NY';
-  };
-
-  const userLocation = getUserLocation();
+  }, [currentLocation]);
 
   // Fetch featured events with pagination
   const { data: pageData, isLoading, isFetching } = useQuery<{events: Event[], hasMore: boolean}>({
