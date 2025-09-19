@@ -330,6 +330,8 @@ export class MemStorage implements IStorage {
       id,
       eventIds: insertNightPlan.eventIds || [],
       optimizedRoute: insertNightPlan.optimizedRoute || [],
+      totalBudget: insertNightPlan.totalBudget || null,
+      groupId: insertNightPlan.groupId || null,
       createdAt: now,
       updatedAt: now
     };
@@ -371,6 +373,7 @@ export class MemStorage implements IStorage {
     const group: Group = { 
       ...insertGroup, 
       id,
+      description: insertGroup.description || null,
       createdAt: now,
       updatedAt: now
     };
@@ -381,7 +384,7 @@ export class MemStorage implements IStorage {
       id: randomUUID(),
       groupId: id,
       userId: insertGroup.createdBy,
-      role: 'admin',
+      role: 'admin' as const,
       joinedAt: now
     };
     this.groupMemberships.set(membership.id, membership);
@@ -444,6 +447,7 @@ export class MemStorage implements IStorage {
     const membership: GroupMembership = {
       ...insertMembership,
       id,
+      role: insertMembership.role || 'member',
       joinedAt: new Date()
     };
     this.groupMemberships.set(id, membership);
