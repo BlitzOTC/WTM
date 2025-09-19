@@ -192,8 +192,8 @@ export default function Plan() {
               className="bg-primary text-white hover:bg-indigo-700"
               data-testid="button-create-group"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Group
+              <Plus className="h-4 w-4 mr-1" />
+              Group Plan
             </Button>
           </div>
           <p className="text-gray-600 md:ml-14">Your curated night out</p>
