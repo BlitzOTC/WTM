@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { type Event } from "@shared/schema";
 import EventCard from "@/components/event-card";
 import PlanSummaryModal from "@/components/plan-summary-modal";
-import { BookOpen, MapPin, Clock, DollarSign, ChevronDown, Play, Navigation, CheckCircle, AlertCircle, Users } from "lucide-react";
+import { BookOpen, MapPin, Clock, DollarSign, ChevronDown, Play, Navigation, CheckCircle, AlertCircle, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { usePlan } from "@/hooks/use-plan";
@@ -136,28 +136,15 @@ export default function Plan() {
               </div>
             </div>
 
-            {/* Group buttons on the right */}
-            <div className="flex items-center space-x-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setLocation('/groups')}
-                className="flex items-center space-x-1"
-                data-testid="button-my-groups"
-              >
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">My Groups</span>
-              </Button>
-              <Button 
-                size="sm"
-                onClick={() => setLocation('/create-group')}
-                className="flex items-center space-x-1 bg-primary text-white hover:bg-indigo-700"
-                data-testid="button-create-group"
-              >
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Create Group</span>
-              </Button>
-            </div>
+            {/* Create Group button on the right */}
+            <Button 
+              onClick={() => setLocation('/create-group')}
+              className="bg-primary text-white hover:bg-indigo-700"
+              data-testid="button-create-group"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Group
+            </Button>
           </div>
           <p className="text-gray-600 md:ml-14">Your curated night out</p>
         </div>
