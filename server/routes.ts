@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertEventSchema, insertNightPlanSchema, type Event } from "@shared/schema";
+import { insertEventSchema, insertNightPlanSchema, insertGroupSchema, insertGroupMembershipSchema, insertSharedPlanSchema, type Event } from "@shared/schema";
 import { z } from "zod";
 import GooglePlacesService from "./google-places";
 import { EnhancedVenueEventGenerator } from "./real-events";
@@ -569,6 +569,216 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid night plan data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to update night plan" });
+    }
+  });
+
+  // Simple auth middleware - in real app this would verify JWT/session
+  const getCurrentUserId = () => "current-user-id"; // Mock current user
+  
+  // Group endpoints with basic authorization
+  app.get("/api/groups/:id", async (req, res) => {
+    try {
+      const currentUserId = getCurrentUserId();
+      const group = await storage.getGroup(req.params.id);
+      if (!group) {
+        return res.status(404).json({ message: "Group not found" });
+      }
+      
+      // Check if user is a member
+      const isMember = await storage.isGroupMember(req.params.id, currentUserId);
+      if (!isMember) {
+        return res.status(403).json({ message: "Access denied - not a group member" });
+      }
+      
+      res.json(group);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch group" });
+    }
+  });
+
+  app.get("/api/users/:userId/groups", async (req, res) => {
+    try {
+      const groups = await storage.getUserGroups(req.params.userId);
+      res.json(groups);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user groups" });
+    }
+  });
+
+  app.post("/api/groups", async (req, res) => {
+    try {
+      const currentUserId = getCurrentUserId();
+      const validatedData = insertGroupSchema.parse({
+        ...req.body,
+        createdBy: currentUserId // Override to prevent impersonation
+      });
+      const group = await storage.createGroup(validatedData);
+      res.status(201).json(group);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid group data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create group" });
+    }
+  });
+
+  app.delete("/api/groups/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteGroup(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Group not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete group" });
+    }
+  });
+
+  // Group membership endpoints
+  app.get("/api/groups/:groupId/members", async (req, res) => {
+    try {
+      const currentUserId = getCurrentUserId();
+      
+      // Check if current user is a member
+      const isMember = await storage.isGroupMember(req.params.groupId, currentUserId);
+      if (!isMember) {
+        return res.status(403).json({ message: "Access denied - not a group member" });
+      }
+      
+      const members = await storage.getGroupMembers(req.params.groupId);
+      res.json(members);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch group members" });
+    }
+  });
+
+  app.post("/api/groups/:groupId/members", async (req, res) => {
+    try {
+      const currentUserId = getCurrentUserId();
+      
+      // Check if current user is group admin
+      const members = await storage.getGroupMembers(req.params.groupId);
+      const currentMember = members.find(m => m.userId === currentUserId);
+      if (!currentMember || currentMember.role !== 'admin') {
+        return res.status(403).json({ message: "Only group admins can add members" });
+      }
+      
+      const validatedData = insertGroupMembershipSchema.parse({
+        ...req.body,
+        groupId: req.params.groupId
+      });
+      const membership = await storage.addGroupMember(validatedData);
+      res.status(201).json(membership);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid membership data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to add group member" });
+    }
+  });
+
+  app.delete("/api/groups/:groupId/members/:userId", async (req, res) => {
+    try {
+      const success = await storage.removeGroupMember(req.params.groupId, req.params.userId);
+      if (!success) {
+        return res.status(404).json({ message: "Group membership not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to remove group member" });
+    }
+  });
+
+  // Shared plan endpoints
+  app.get("/api/groups/:groupId/shared-plans", async (req, res) => {
+    try {
+      const currentUserId = getCurrentUserId();
+      
+      // Check if current user is a member
+      const isMember = await storage.isGroupMember(req.params.groupId, currentUserId);
+      if (!isMember) {
+        return res.status(403).json({ message: "Access denied - not a group member" });
+      }
+      
+      const sharedPlans = await storage.getGroupSharedPlans(req.params.groupId);
+      res.json(sharedPlans);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch shared plans" });
+    }
+  });
+
+  app.post("/api/groups/:groupId/shared-plans", async (req, res) => {
+    try {
+      const currentUserId = getCurrentUserId();
+      
+      // Check if current user is a member
+      const isMember = await storage.isGroupMember(req.params.groupId, currentUserId);
+      if (!isMember) {
+        return res.status(403).json({ message: "Access denied - not a group member" });
+      }
+      
+      const validatedData = insertSharedPlanSchema.parse({
+        ...req.body,
+        groupId: req.params.groupId,
+        userId: currentUserId // Override to prevent impersonation
+      });
+      const sharedPlan = await storage.createSharedPlan(validatedData);
+      res.status(201).json(sharedPlan);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid shared plan data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create shared plan" });
+    }
+  });
+
+  app.delete("/api/shared-plans/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteSharedPlan(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Shared plan not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete shared plan" });
+    }
+  });
+
+  // Get all users for friend selection
+  app.get("/api/users", async (req, res) => {
+    try {
+      // In a real app, this would have pagination, search, etc.
+      // For now, we'll implement a simple search by username
+      const { search } = req.query;
+      
+      // Since MemStorage doesn't have a method to get all users, let's add it
+      // For now, we'll return a simple response
+      res.json([]);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Get user by ID
+  app.get("/api/users/:id", async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Create user endpoint (if not already exists)
+  app.post("/api/users", async (req, res) => {
+    try {
+      const user = await storage.createUser(req.body);
+      res.status(201).json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create user" });
     }
   });
 

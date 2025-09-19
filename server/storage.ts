@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Event, type InsertEvent, type NightPlan, type InsertNightPlan } from "@shared/schema";
+import { type User, type InsertUser, type Event, type InsertEvent, type NightPlan, type InsertNightPlan, type Group, type InsertGroup, type GroupMembership, type InsertGroupMembership, type SharedPlan, type InsertSharedPlan } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -26,21 +26,59 @@ export interface IStorage {
   getNightPlan(userId: string): Promise<NightPlan | undefined>;
   createNightPlan(nightPlan: InsertNightPlan): Promise<NightPlan>;
   updateNightPlan(userId: string, nightPlan: Partial<InsertNightPlan>): Promise<NightPlan | undefined>;
+
+  // Group methods
+  getGroup(id: string): Promise<Group | undefined>;
+  getUserGroups(userId: string): Promise<Group[]>;
+  createGroup(group: InsertGroup): Promise<Group>;
+  deleteGroup(id: string): Promise<boolean>;
+
+  // Group membership methods
+  getGroupMembers(groupId: string): Promise<(GroupMembership & { user: User })[]>;
+  addGroupMember(membership: InsertGroupMembership): Promise<GroupMembership>;
+  removeGroupMember(groupId: string, userId: string): Promise<boolean>;
+  isGroupMember(groupId: string, userId: string): Promise<boolean>;
+
+  // Shared plan methods
+  getGroupSharedPlans(groupId: string): Promise<(SharedPlan & { user: User })[]>;
+  createSharedPlan(sharedPlan: InsertSharedPlan): Promise<SharedPlan>;
+  deleteSharedPlan(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private events: Map<string, Event>;
   private nightPlans: Map<string, NightPlan>;
+  private groups: Map<string, Group>;
+  private groupMemberships: Map<string, GroupMembership>;
+  private sharedPlans: Map<string, SharedPlan>;
 
   constructor() {
     this.users = new Map();
     this.events = new Map();
     this.nightPlans = new Map();
+    this.groups = new Map();
+    this.groupMemberships = new Map();
+    this.sharedPlans = new Map();
     this.seedData();
   }
 
   private seedData() {
+    // Create sample users for friends
+    const sampleUsers = [
+      { id: "current-user-id", username: "you", password: "password", email: "you@example.com", userType: "user" },
+      { id: "1", username: "alex_chen", password: "password", email: "alex@example.com", userType: "user" },
+      { id: "2", username: "sarah_j", password: "password", email: "sarah@example.com", userType: "user" },
+      { id: "3", username: "mike_wilson", password: "password", email: "mike@example.com", userType: "user" },
+      { id: "4", username: "emma_davis", password: "password", email: "emma@example.com", userType: "user" },
+      { id: "5", username: "david_kim", password: "password", email: "david@example.com", userType: "user" },
+      { id: "6", username: "lisa_martin", password: "password", email: "lisa@example.com", userType: "user" },
+    ];
+    
+    sampleUsers.forEach(user => {
+      this.users.set(user.id, user as User);
+    });
+    
     // Create sample events for San Francisco
     const sampleEvents: Event[] = [
       {
@@ -302,6 +340,137 @@ export class MemStorage implements IStorage {
     const updatedPlan = { ...existingPlan, ...updateData };
     this.nightPlans.set(existingPlan.id, updatedPlan);
     return updatedPlan;
+  }
+
+  // Group methods
+  async getGroup(id: string): Promise<Group | undefined> {
+    return this.groups.get(id);
+  }
+
+  async getUserGroups(userId: string): Promise<Group[]> {
+    const userMemberships = Array.from(this.groupMemberships.values())
+      .filter(membership => membership.userId === userId);
+    
+    const groups: Group[] = [];
+    for (const membership of userMemberships) {
+      const group = this.groups.get(membership.groupId);
+      if (group) {
+        groups.push(group);
+      }
+    }
+    return groups;
+  }
+
+  async createGroup(insertGroup: InsertGroup): Promise<Group> {
+    const id = randomUUID();
+    const now = new Date();
+    const group: Group = { 
+      ...insertGroup, 
+      id,
+      createdAt: now,
+      updatedAt: now
+    };
+    this.groups.set(id, group);
+    
+    // Add creator as admin member
+    const membership: GroupMembership = {
+      id: randomUUID(),
+      groupId: id,
+      userId: insertGroup.createdBy,
+      role: 'admin',
+      joinedAt: now
+    };
+    this.groupMemberships.set(membership.id, membership);
+    
+    return group;
+  }
+
+  async deleteGroup(id: string): Promise<boolean> {
+    // Remove all memberships
+    const memberships = Array.from(this.groupMemberships.values())
+      .filter(membership => membership.groupId === id);
+    memberships.forEach(membership => this.groupMemberships.delete(membership.id));
+    
+    // Remove all shared plans
+    const sharedPlans = Array.from(this.sharedPlans.values())
+      .filter(plan => plan.groupId === id);
+    sharedPlans.forEach(plan => this.sharedPlans.delete(plan.id));
+    
+    return this.groups.delete(id);
+  }
+
+  // Group membership methods
+  async getGroupMembers(groupId: string): Promise<(GroupMembership & { user: User })[]> {
+    const memberships = Array.from(this.groupMemberships.values())
+      .filter(membership => membership.groupId === groupId);
+    
+    const members: (GroupMembership & { user: User })[] = [];
+    for (const membership of memberships) {
+      const user = this.users.get(membership.userId);
+      if (user) {
+        members.push({ ...membership, user });
+      }
+    }
+    return members;
+  }
+
+  async addGroupMember(insertMembership: InsertGroupMembership): Promise<GroupMembership> {
+    const id = randomUUID();
+    const membership: GroupMembership = {
+      ...insertMembership,
+      id,
+      joinedAt: new Date()
+    };
+    this.groupMemberships.set(id, membership);
+    return membership;
+  }
+
+  async removeGroupMember(groupId: string, userId: string): Promise<boolean> {
+    const membership = Array.from(this.groupMemberships.values())
+      .find(m => m.groupId === groupId && m.userId === userId);
+    
+    if (membership) {
+      return this.groupMemberships.delete(membership.id);
+    }
+    return false;
+  }
+
+  async isGroupMember(groupId: string, userId: string): Promise<boolean> {
+    return Array.from(this.groupMemberships.values())
+      .some(m => m.groupId === groupId && m.userId === userId);
+  }
+
+  // Shared plan methods
+  async getGroupSharedPlans(groupId: string): Promise<(SharedPlan & { user: User })[]> {
+    const plans = Array.from(this.sharedPlans.values())
+      .filter(plan => plan.groupId === groupId)
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime()); // newest first
+    
+    const plansWithUsers: (SharedPlan & { user: User })[] = [];
+    for (const plan of plans) {
+      const user = this.users.get(plan.userId);
+      if (user) {
+        plansWithUsers.push({ ...plan, user });
+      }
+    }
+    return plansWithUsers;
+  }
+
+  async createSharedPlan(insertSharedPlan: InsertSharedPlan): Promise<SharedPlan> {
+    const id = randomUUID();
+    const now = new Date();
+    const sharedPlan: SharedPlan = {
+      ...insertSharedPlan,
+      id,
+      createdAt: now,
+      updatedAt: now
+    };
+    this.sharedPlans.set(id, sharedPlan);
+    return sharedPlan;
+  }
+
+  async deleteSharedPlan(id: string): Promise<boolean> {
+    return this.sharedPlans.delete(id);
   }
 }
 

@@ -30,6 +30,9 @@ import OnboardingLocation from "@/pages/onboarding-location";
 import OnboardingFrequency from "@/pages/onboarding-frequency";
 import OnboardingInterests from "@/pages/onboarding-interests";
 import OnboardingPreferences from "@/pages/onboarding-preferences";
+import CreateGroup from "@/pages/create-group";
+import Groups from "@/pages/groups";
+import GroupView from "@/pages/group-view";
 import MobileBottomNav from "@/components/mobile-bottom-nav";
 
 function Router() {
@@ -73,6 +76,9 @@ function Router() {
         <Route path="/onboarding/frequency" component={OnboardingFrequency} />
         <Route path="/onboarding/interests" component={OnboardingInterests} />
         <Route path="/onboarding/preferences" component={OnboardingPreferences} />
+        <Route path="/create-group" component={CreateGroup} />
+        <Route path="/groups" component={Groups} />
+        <Route path="/group/:groupId" component={GroupView} />
         <Route component={NotFound} />
       </Switch>
       

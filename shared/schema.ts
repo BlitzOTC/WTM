@@ -41,6 +41,35 @@ export const nightPlans = pgTable("night_plans", {
   eventIds: jsonb("event_ids").notNull().default("[]"), // array of event ids
   totalBudget: integer("total_budget").default(0),
   optimizedRoute: jsonb("optimized_route").default("[]"),
+  groupId: varchar("group_id"), // nullable, links to groups table
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const groups = pgTable("groups", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description"),
+  createdBy: varchar("created_by").notNull(), // user id who created the group
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const groupMemberships = pgTable("group_memberships", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  groupId: varchar("group_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  role: text("role").notNull().default("member"), // "admin", "member"
+  joinedAt: timestamp("joined_at").defaultNow(),
+});
+
+export const sharedPlans = pgTable("shared_plans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  groupId: varchar("group_id").notNull(),
+  userId: varchar("user_id").notNull(), // who shared the plan
+  planData: jsonb("plan_data").notNull(), // the actual plan with events
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
@@ -61,9 +90,34 @@ export const insertEventSchema = createInsertSchema(events).omit({
 
 export const insertNightPlanSchema = createInsertSchema(nightPlans).omit({
   id: true,
+  createdAt: true,
+  updatedAt: true,
 }).extend({
   eventIds: z.array(z.string()).default([]),
   optimizedRoute: z.array(z.string()).default([]),
+});
+
+export const insertGroupSchema = createInsertSchema(groups).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertGroupMembershipSchema = createInsertSchema(groupMemberships).omit({
+  id: true,
+  joinedAt: true,
+});
+
+export const insertSharedPlanSchema = createInsertSchema(sharedPlans).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  planData: z.object({
+    events: z.array(z.any()),
+    totalBudget: z.number().optional(),
+    name: z.string().optional(),
+  }),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -72,3 +126,9 @@ export type InsertEvent = z.infer<typeof insertEventSchema>;
 export type Event = typeof events.$inferSelect;
 export type InsertNightPlan = z.infer<typeof insertNightPlanSchema>;
 export type NightPlan = typeof nightPlans.$inferSelect;
+export type InsertGroup = z.infer<typeof insertGroupSchema>;
+export type Group = typeof groups.$inferSelect;
+export type InsertGroupMembership = z.infer<typeof insertGroupMembershipSchema>;
+export type GroupMembership = typeof groupMemberships.$inferSelect;
+export type InsertSharedPlan = z.infer<typeof insertSharedPlanSchema>;
+export type SharedPlan = typeof sharedPlans.$inferSelect;

@@ -2,16 +2,18 @@ import { useState, useEffect } from "react";
 import { type Event } from "@shared/schema";
 import EventCard from "@/components/event-card";
 import PlanSummaryModal from "@/components/plan-summary-modal";
-import { BookOpen, MapPin, Clock, DollarSign, ChevronDown, Play, Navigation, CheckCircle, AlertCircle } from "lucide-react";
+import { BookOpen, MapPin, Clock, DollarSign, ChevronDown, Play, Navigation, CheckCircle, AlertCircle, Users, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { usePlan } from "@/hooks/use-plan";
 import { Badge } from "@/components/ui/badge";
+import { useLocation } from "wouter";
 
 export default function Plan() {
   const { events: selectedEvents, removeEvent, clearPlan } = usePlan();
   const [showPlanSummary, setShowPlanSummary] = useState(false);
   const [activeNightPlan, setActiveNightPlan] = useState<any>(null);
+  const [, setLocation] = useLocation();
 
   // Calculate total cost
   const totalCost = selectedEvents.reduce((sum, event) => sum + event.price, 0);
@@ -99,37 +101,62 @@ export default function Plan() {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center space-x-4 mb-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="hidden md:flex items-center space-x-2 p-2 hover:bg-gray-50" data-testid="dropdown-navigation-menu">
-                  <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">T</span>
-                  </div>
-                  <span className="text-xl font-bold text-gray-900">My Plan</span>
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuItem onClick={() => window.location.href = '/'} data-testid="nav-dropdown-search">
-                  🔍 Search
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.location.href = '/tonight'} data-testid="nav-dropdown-tonight">
-                  📅 Tonight
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.location.href = '/plan'} data-testid="nav-dropdown-plan">
-                  📋 My Plan
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.location.href = '/profile'} data-testid="nav-dropdown-profile">
-                  👤 Profile
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            {/* Mobile header */}
-            <div className="flex items-center space-x-2 md:hidden">
-              <BookOpen className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold text-gray-900">My Plan</h1>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="hidden md:flex items-center space-x-2 p-2 hover:bg-gray-50" data-testid="dropdown-navigation-menu">
+                    <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">T</span>
+                    </div>
+                    <span className="text-xl font-bold text-gray-900">My Plan</span>
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={() => window.location.href = '/'} data-testid="nav-dropdown-search">
+                    🔍 Search
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.location.href = '/tonight'} data-testid="nav-dropdown-tonight">
+                    📅 Tonight
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.location.href = '/plan'} data-testid="nav-dropdown-plan">
+                    📋 My Plan
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.location.href = '/profile'} data-testid="nav-dropdown-profile">
+                    👤 Profile
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              {/* Mobile header */}
+              <div className="flex items-center space-x-2 md:hidden">
+                <BookOpen className="h-6 w-6 text-primary" />
+                <h1 className="text-2xl font-bold text-gray-900">My Plan</h1>
+              </div>
+            </div>
+
+            {/* Group buttons on the right */}
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setLocation('/groups')}
+                className="flex items-center space-x-1"
+                data-testid="button-my-groups"
+              >
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">My Groups</span>
+              </Button>
+              <Button 
+                size="sm"
+                onClick={() => setLocation('/create-group')}
+                className="flex items-center space-x-1 bg-primary text-white hover:bg-indigo-700"
+                data-testid="button-create-group"
+              >
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">Create Group</span>
+              </Button>
             </div>
           </div>
           <p className="text-gray-600 md:ml-14">Your curated night out</p>

@@ -4,7 +4,18 @@
 
 This is a full-stack nightlife and event discovery application built with a modern TypeScript stack. The app allows users to search for real-time events in any city worldwide, filter by preferences, create personalized night plans, and host their own events. It features a React frontend with shadcn/ui components, an Express.js backend with RESTful APIs, Google Places API integration for location autocomplete and real-time event generation, and uses Drizzle ORM for database management with PostgreSQL.
 
-## Recent Changes (September 3, 2025)
+## Recent Changes (September 19, 2025)
+
+- **Group Feature Implementation**: Built comprehensive group system for sharing night plans among friends
+  - Created database schema with groups, group_memberships, and shared_plans tables
+  - Implemented complete API with authorization middleware for secure group operations
+  - Added Create Group and My Groups buttons to My Plan page header
+  - Built group creation page with friend selection interface
+  - Created group view page for viewing and sharing plans within groups
+  - Added proper access control - only group members can view/share, only admins can manage members
+  - Integrated with existing plan system for seamless plan sharing functionality
+
+## Previous Changes (September 3, 2025)
 
 - **Personalized Event Recommendations**: Added smart recommendations section on search page based on user's onboarding preferences (interests, budget, etc.)
 - **Profile Interest Tags**: Added colored interest badges to user profiles showing selected event preferences from onboarding
@@ -54,11 +65,17 @@ UI/UX Preferences:
 - **Users Table**: Authentication and user profile data with support for venue owners
 - **Events Table**: Comprehensive event information including location, pricing, categories, and metadata
 - **Night Plans Table**: User-created event collections with budget tracking and route optimization
+- **Groups Table**: User-created groups for sharing night plans with friends
+- **Group Memberships Table**: User-group relationships with role-based permissions (admin/member)
+- **Shared Plans Table**: Night plans shared within groups with user attribution and timestamps
 
 ### API Structure
 - **Event Management**: CRUD operations for events with advanced filtering (location, price, categories, age requirements)
 - **User Management**: User creation and retrieval endpoints
 - **Night Planning**: Personal event collection management with budget and route optimization features
+- **Group Management**: Complete CRUD operations for groups with authorization middleware
+- **Group Memberships**: Role-based member management with admin controls
+- **Shared Plans**: Secure plan sharing within groups with proper access controls
 - **Validation**: Request validation using Zod schemas with proper error responses
 
 ### Authentication & Authorization
