@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Users, Calendar, Eye, Settings } from "lucide-react";
+import { ArrowLeft, Users, Calendar } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { type Group } from "@shared/schema";
 
@@ -85,7 +85,12 @@ export default function Groups() {
         ) : (
           <div className="space-y-4">
             {groups.map((group: Group) => (
-              <Card key={group.id} className="hover:shadow-md transition-shadow">
+              <Card 
+                key={group.id} 
+                className="hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => handleViewGroup(group.id)}
+                data-testid={`card-group-${group.id}`}
+              >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -112,27 +117,14 @@ export default function Groups() {
                   )}
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <Users className="h-4 w-4" />
-                        <span>5 members</span> {/* TODO: Get actual member count */}
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>3 plans</span> {/* TODO: Get actual plan count */}
-                      </div>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-1">
+                      <Users className="h-4 w-4" />
+                      <span>5 members</span> {/* TODO: Get actual member count */}
                     </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleViewGroup(group.id)}
-                        data-testid={`button-view-group-${group.id}`}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>3 plans</span> {/* TODO: Get actual plan count */}
                     </div>
                   </div>
                 </CardContent>
