@@ -3,15 +3,50 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Users, Calendar } from "lucide-react";
+import { ArrowLeft, Users, Calendar, Share2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { type Group } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock user ID - in real app this would come from auth context
 const CURRENT_USER_ID = "current-user-id";
 
 export default function Groups() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  
+  // Check if we're in share mode
+  const urlParams = new URLSearchParams(window.location.search);
+  const isShareMode = urlParams.get('shareMode') === 'true';
+  const [planToShare, setPlanToShare] = useState<any>(null);
+
+  // Load plan data when in share mode
+  useEffect(() => {
+    if (isShareMode) {
+      const storedPlan = localStorage.getItem('planToShare');
+      if (storedPlan) {
+        try {
+          setPlanToShare(JSON.parse(storedPlan));
+        } catch (error) {
+          console.error('Failed to parse plan data:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load plan data for sharing.",
+            variant: "destructive",
+          });
+          setLocation('/plan');
+        }
+      } else {
+        toast({
+          title: "No plan to share",
+          description: "Please go back and select a plan to share.",
+          variant: "destructive",
+        });
+        setLocation('/plan');
+      }
+    }
+  }, [isShareMode, setLocation, toast]);
 
   // Fetch user's groups
   const { data: groups = [], isLoading, error } = useQuery<Group[]>({
@@ -62,8 +97,39 @@ export default function Groups() {
     },
   });
 
-  const handleViewGroup = (groupId: string) => {
-    setLocation(`/group/${groupId}`);
+  const handleViewGroup = async (groupId: string) => {
+    if (isShareMode && planToShare) {
+      try {
+        await apiRequest('POST', `/api/groups/${groupId}/shared-plans`, {
+          userId: CURRENT_USER_ID,
+          planData: planToShare
+        });
+        
+        // Invalidate the group's shared plans cache
+        queryClient.invalidateQueries({ queryKey: [`/api/groups/${groupId}/shared-plans`] });
+        
+        // Clean up stored plan data
+        localStorage.removeItem('planToShare');
+        
+        toast({
+          title: "Plan shared!",
+          description: `Your plan has been shared with the group.`,
+        });
+        
+        // Navigate to the group view to see the shared plan
+        setLocation(`/group/${groupId}`);
+        
+      } catch (error) {
+        console.error('Failed to share plan:', error);
+        toast({
+          title: "Failed to share plan",
+          description: "There was an error sharing your plan. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setLocation(`/group/${groupId}`);
+    }
   };
 
   if (isLoading) {
@@ -95,8 +161,12 @@ export default function Groups() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">My Groups</h1>
-              <p className="text-gray-600">Share night plans with friends</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {isShareMode ? 'Share Plan to Group' : 'My Groups'}
+              </h1>
+              <p className="text-gray-600">
+                {isShareMode ? 'Select a group to share your plan with' : 'Share night plans with friends'}
+              </p>
             </div>
           </div>
 
@@ -131,7 +201,9 @@ export default function Groups() {
             {groups.map((group: Group) => (
               <Card 
                 key={group.id} 
-                className="hover:shadow-md transition-shadow cursor-pointer"
+                className={`hover:shadow-md transition-shadow cursor-pointer ${
+                  isShareMode ? 'border-purple-200 hover:border-purple-400 hover:bg-purple-50' : ''
+                }`}
                 onClick={() => handleViewGroup(group.id)}
                 data-testid={`card-group-${group.id}`}
               >
@@ -150,9 +222,16 @@ export default function Groups() {
                         </p>
                       </div>
                     </div>
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      Active
-                    </Badge>
+                    {isShareMode ? (
+                      <Badge className="bg-purple-100 text-purple-800">
+                        <Share2 className="h-3 w-3 mr-1" />
+                        Share Here
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                        Active
+                      </Badge>
+                    )}
                   </div>
                   {group.description && (
                     <p className="text-sm text-gray-600 mt-2" data-testid={`text-group-description-${group.id}`}>

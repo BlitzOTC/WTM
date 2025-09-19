@@ -358,6 +358,23 @@ export default function Plan() {
               </Button>
               
               <Button
+                className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                size="lg"
+                onClick={() => {
+                  // Store current plan data for sharing
+                  localStorage.setItem('planToShare', JSON.stringify({
+                    events: selectedEvents,
+                    totalBudget: totalCost,
+                    name: `My Night Plan - ${new Date().toLocaleDateString()}`
+                  }));
+                  setLocation('/groups?shareMode=true');
+                }}
+                data-testid="button-share-plan-to-group"
+              >
+                Share Plan to Group
+              </Button>
+              
+              <Button
                 variant="outline"
                 className="w-full"
                 onClick={clearPlan}
