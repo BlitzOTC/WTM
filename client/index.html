@@ -9,6 +9,34 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Prevent MetaMask auto-connection attempts
+      if (typeof window !== 'undefined') {
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event.reason;
+          var isMetaMaskError = false;
+          
+          // Check various ways MetaMask error can appear
+          if (reason) {
+            if (typeof reason === 'string' && reason.includes('MetaMask')) {
+              isMetaMaskError = true;
+            } else if (reason.message && reason.message.includes('MetaMask')) {
+              isMetaMaskError = true;
+            } else if (reason.stack && reason.stack.includes('chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn')) {
+              isMetaMaskError = true;
+            }
+          }
+          
+          if (isMetaMaskError) {
+            event.preventDefault();
+            // Only log in development
+            if (window.location.hostname === 'localhost' || window.location.hostname.includes('replit')) {
+              console.log('Suppressed MetaMask connection error');
+            }
+          }
+        });
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
