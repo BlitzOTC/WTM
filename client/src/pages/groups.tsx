@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Users, Plus, Calendar, Eye, Settings } from "lucide-react";
+import { ArrowLeft, Users, Calendar, Eye, Settings } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { type Group } from "@shared/schema";
 
@@ -62,7 +62,7 @@ export default function Groups() {
             className="bg-primary text-white hover:bg-indigo-700"
             data-testid="button-create-new-group"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Users className="h-4 w-4 mr-2" />
             New Group
           </Button>
         </div>
@@ -78,7 +78,7 @@ export default function Groups() {
               className="bg-primary text-white hover:bg-indigo-700"
               data-testid="button-create-first-group"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Users className="h-4 w-4 mr-2" />
               Create Your First Group
             </Button>
           </div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { type Event } from "@shared/schema";
 import EventCard from "@/components/event-card";
 import PlanSummaryModal from "@/components/plan-summary-modal";
-import { BookOpen, MapPin, Clock, DollarSign, ChevronDown, Play, Navigation, CheckCircle, AlertCircle, Users, Plus } from "lucide-react";
+import { BookOpen, MapPin, Clock, DollarSign, ChevronDown, Play, Navigation, CheckCircle, AlertCircle, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { usePlan } from "@/hooks/use-plan";
@@ -154,7 +154,7 @@ export default function Plan() {
                 className="flex items-center space-x-1 bg-primary text-white hover:bg-indigo-700"
                 data-testid="button-create-group"
               >
-                <Plus className="h-4 w-4" />
+                <Users className="h-4 w-4" />
                 <span className="hidden sm:inline">Create Group</span>
               </Button>
             </div>

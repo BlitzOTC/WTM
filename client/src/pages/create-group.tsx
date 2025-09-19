@@ -86,6 +86,9 @@ export default function CreateGroup() {
         description: `"${data.name}" has been created with ${data.selectedFriends.length} members.`,
       });
 
+      // Invalidate groups cache to refresh the list
+      queryClient.invalidateQueries({ queryKey: [`/api/users/current-user-id/groups`] });
+
       // Navigate to the groups list
       setLocation("/groups");
     } catch (error) {
