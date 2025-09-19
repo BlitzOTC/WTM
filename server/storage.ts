@@ -67,13 +67,13 @@ export class MemStorage implements IStorage {
   private seedData() {
     // Create sample users for friends
     const sampleUsers = [
-      { id: "current-user-id", username: "you", password: "password", email: "you@example.com", userType: "user" },
-      { id: "1", username: "alex_chen", password: "password", email: "alex@example.com", userType: "user" },
-      { id: "2", username: "sarah_j", password: "password", email: "sarah@example.com", userType: "user" },
-      { id: "3", username: "mike_wilson", password: "password", email: "mike@example.com", userType: "user" },
-      { id: "4", username: "emma_davis", password: "password", email: "emma@example.com", userType: "user" },
-      { id: "5", username: "david_kim", password: "password", email: "david@example.com", userType: "user" },
-      { id: "6", username: "lisa_martin", password: "password", email: "lisa@example.com", userType: "user" },
+      { id: "current-user-id", username: "you", password: "password", email: "you@example.com", userType: "user", venueName: null },
+      { id: "1", username: "alex_chen", password: "password", email: "alex@example.com", userType: "user", venueName: null },
+      { id: "2", username: "sarah_j", password: "password", email: "sarah@example.com", userType: "user", venueName: null },
+      { id: "3", username: "mike_wilson", password: "password", email: "mike@example.com", userType: "user", venueName: null },
+      { id: "4", username: "emma_davis", password: "password", email: "emma@example.com", userType: "user", venueName: null },
+      { id: "5", username: "david_kim", password: "password", email: "david@example.com", userType: "user", venueName: null },
+      { id: "6", username: "lisa_martin", password: "password", email: "lisa@example.com", userType: "user", venueName: null },
     ];
     
     sampleUsers.forEach(user => {
@@ -324,11 +324,14 @@ export class MemStorage implements IStorage {
 
   async createNightPlan(insertNightPlan: InsertNightPlan): Promise<NightPlan> {
     const id = randomUUID();
+    const now = new Date();
     const nightPlan: NightPlan = { 
       ...insertNightPlan, 
       id,
       eventIds: insertNightPlan.eventIds || [],
-      optimizedRoute: insertNightPlan.optimizedRoute || []
+      optimizedRoute: insertNightPlan.optimizedRoute || [],
+      createdAt: now,
+      updatedAt: now
     };
     this.nightPlans.set(id, nightPlan);
     return nightPlan;
