@@ -5,6 +5,49 @@ import { insertEventSchema, insertNightPlanSchema, insertGroupSchema, insertGrou
 import { z } from "zod";
 import GooglePlacesService from "./google-places";
 import { EnhancedVenueEventGenerator } from "./real-events";
+import { TicketmasterService } from "./ticketmaster-service";
+import { TicketmasterAPI, EventbriteAPI, RealEventAggregator } from "./event-apis";
+
+// Helper function to geocode location for API calls
+async function geocodeLocationForAPIs(location: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    // Use Google Geocoding API if available
+    const googleApiKey = process.env.GOOGLE_API_KEY;
+    if (googleApiKey) {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${googleApiKey}`
+      );
+      const data = await response.json();
+      
+      if (data.results && data.results.length > 0) {
+        const { lat, lng } = data.results[0].geometry.location;
+        return { lat, lng };
+      }
+    }
+
+    // Fallback to hardcoded coordinates for major cities (same as TicketmasterService)
+    const cityCoords: Record<string, { lat: number; lng: number }> = {
+      'los angeles': { lat: 34.0522, lng: -118.2437 },
+      'new york': { lat: 40.7128, lng: -74.0060 },
+      'chicago': { lat: 41.8781, lng: -87.6298 },
+      'houston': { lat: 29.7604, lng: -95.3698 },
+      'phoenix': { lat: 33.4484, lng: -112.0740 },
+      'miami': { lat: 25.7617, lng: -80.1918 },
+      'atlanta': { lat: 33.7490, lng: -84.3880 },
+      'boston': { lat: 42.3601, lng: -71.0589 },
+      'seattle': { lat: 47.6062, lng: -122.3321 },
+      'denver': { lat: 39.7392, lng: -104.9903 },
+      'san francisco': { lat: 37.7749, lng: -122.4194 },
+      'orlando': { lat: 28.5383, lng: -81.3792 }
+    };
+
+    const cityKey = location.toLowerCase().split(',')[0].trim();
+    return cityCoords[cityKey] || null;
+  } catch (error) {
+    console.error('Error geocoding location:', error);
+    return null;
+  }
+}
 
 // Generate location-specific events based on the search location
 function generateLocationBasedEvents(location: string): Event[] {
@@ -285,16 +328,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate a mix of events from different categories the user likes
       let allEvents: Event[] = [];
       
-      // Try Google Places first if we have real location data
+      // Try to get real events from multiple sources
       try {
+        // Google Places events
         const googleApiKey = process.env.GOOGLE_API_KEY;
         if (googleApiKey) {
           const googlePlaces = new GooglePlacesService(googleApiKey);
           const googleEvents = await googlePlaces.searchEvents(location);
           allEvents = [...allEvents, ...googleEvents];
         }
+
+        // Ticketmaster events
+        const ticketmasterApiKey = process.env.TICKETMASTER_API_KEY;
+        if (ticketmasterApiKey && ticketmasterApiKey !== 'your_ticketmaster_api_key_here') {
+          const ticketmasterService = new TicketmasterService(ticketmasterApiKey);
+          const ticketmasterEvents = await ticketmasterService.searchEvents(location, {
+            size: 30,
+            categories: userCategories,
+            radius: 25
+          });
+          console.log(`Got ${ticketmasterEvents.length} events from Ticketmaster`);
+          allEvents = [...allEvents, ...ticketmasterEvents];
+        }
+
+        // Eventbrite events (using existing API)
+        const eventbriteApiKey = process.env.EVENTBRITE_API_KEY;
+        if (eventbriteApiKey) {
+          try {
+            const realEventAggregator = new RealEventAggregator();
+            realEventAggregator.addAPI(new EventbriteAPI(eventbriteApiKey));
+            
+            // We need coordinates for the API call - get them the same way Ticketmaster does
+            const coords = await geocodeLocationForAPIs(location);
+            if (coords) {
+              const eventbriteEvents = await realEventAggregator.searchAllEvents(location, coords.lat, coords.lng);
+              console.log(`Got ${eventbriteEvents.length} events from Eventbrite`);
+              allEvents = [...allEvents, ...eventbriteEvents];
+            }
+          } catch (error) {
+            console.log('Eventbrite API not available:', error);
+          }
+        }
       } catch (error) {
-        console.log('Google Places not available, using fallback events');
+        console.log('Real event APIs not available, using fallback events:', error);
       }
       
       // Always add synthetic events to ensure we have enough for pagination
@@ -410,17 +486,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { city, state, categories, ageRequirement, maxPrice, minPrice, eventType, location } = req.query;
       
-      // If Google API key is available and location is provided, fetch real events
-      const googleApiKey = process.env.GOOGLE_API_KEY;
-      if (googleApiKey && location) {
+      // If location is provided, fetch real events from multiple sources
+      if (location) {
         try {
           console.log(`Fetching real events for location: ${location}`);
-          const googlePlaces = new GooglePlacesService(googleApiKey);
-          const realEvents = await googlePlaces.searchEvents(location as string);
+          let locationBasedEvents: Event[] = [];
           
-          // Use enhanced venue-based events with real venue names
-          const locationBasedEvents = realEvents.length > 0 ? realEvents : 
-            EnhancedVenueEventGenerator.generateRealEvents(location as string);
+          // Google Places events
+          const googleApiKey = process.env.GOOGLE_API_KEY;
+          if (googleApiKey) {
+            const googlePlaces = new GooglePlacesService(googleApiKey);
+            const googleEvents = await googlePlaces.searchEvents(location as string);
+            locationBasedEvents = [...locationBasedEvents, ...googleEvents];
+          }
+
+          // Ticketmaster events
+          const ticketmasterApiKey = process.env.TICKETMASTER_API_KEY;
+          if (ticketmasterApiKey && ticketmasterApiKey !== 'your_ticketmaster_api_key_here') {
+            const ticketmasterService = new TicketmasterService(ticketmasterApiKey);
+            
+            // Convert query parameters to options
+            const searchOptions: any = {
+              size: 40,
+              radius: 25
+            };
+            
+            if (categories) {
+              searchOptions.categories = typeof categories === 'string' ? [categories] : categories as string[];
+            }
+            
+            if (maxPrice) {
+              searchOptions.priceMax = parseFloat(maxPrice as string);
+            }
+            
+            if (minPrice) {
+              searchOptions.priceMin = parseFloat(minPrice as string);
+            }
+            
+            const ticketmasterEvents = await ticketmasterService.searchEvents(location as string, searchOptions);
+            console.log(`Got ${ticketmasterEvents.length} events from Ticketmaster`);
+            locationBasedEvents = [...locationBasedEvents, ...ticketmasterEvents];
+          }
+          
+          // Use enhanced venue-based events as fallback if no real events found
+          if (locationBasedEvents.length === 0) {
+            locationBasedEvents = EnhancedVenueEventGenerator.generateRealEvents(location as string);
+          }
           
           // Apply filters to events
           let filteredEvents = locationBasedEvents;
